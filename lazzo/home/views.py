@@ -38,3 +38,9 @@ def login(request):
                 return HttpResponse("Credenciales inválidas")
 
     return render(request, "login.html", {"form": LoginForm()})
+
+def logout(request):
+    if "usuario_id" in request.session:
+        del request.session["usuario_id"]
+    django_logout(request)
+    return HttpResponse("Sesión cerrada correctamente")
