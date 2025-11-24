@@ -7,7 +7,7 @@ class RegistroForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ["nombre", "correo", "contrasena", "rol"]
+        fields = ["nombre_completo", "correo", "contrasena", "rol"]
 
 
 class LoginForm(forms.Form):
