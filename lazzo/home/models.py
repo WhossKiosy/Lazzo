@@ -4,9 +4,9 @@ from django.utils import timezone
 
 class Usuario(models.Model):
     roles = [
-        ('cliente','Cliente')
-        ('vendedor','Vendedor')
-        ('admin','Administrador')
+        ('cliente','Cliente'),
+        ('vendedor','Vendedor'),
+        ('admin','Administrador'),
     ]
     idUsuario = models.AutoField(primary_key=True)
     nombre_completo = models.CharField(max_length=100)
@@ -17,7 +17,6 @@ class Usuario(models.Model):
 
     def __str__(self):
         return self.nombre_completo
-
 
 
 class Producto(models.Model):
@@ -32,6 +31,7 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
 
 class ObjetoCarrito(models.Model):
     idObjeto = models.AutoField(primary_key=True)
@@ -53,6 +53,7 @@ class Carrito(models.Model):
     def calcular_total(self):
         self.total = sum(obj.subtotal for obj in self.objetos.all())
         self.save()
+
 
 class Pedido(models.Model):
     idPedido = models.AutoField(primary_key=True)
@@ -83,6 +84,7 @@ class Pago(models.Model):
     def __str__(self):
         return f"Pago {self.idPago}"
 
+
 class Mensaje(models.Model):
     idMensaje = models.AutoField(primary_key=True)
     emisor = models.ForeignKey(Usuario, related_name="mensajes_enviados", on_delete=models.CASCADE)
@@ -92,6 +94,7 @@ class Mensaje(models.Model):
 
     def __str__(self):
         return f"Mensaje {self.idMensaje}"
+
 
 class Notificacion(models.Model):
     idNotificacion = models.AutoField(primary_key=True)
