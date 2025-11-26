@@ -468,3 +468,173 @@ body {
         width: 100%;
     }
 }
+
+/* field styles */
+.field-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f7;
+    padding: 20px;
+}
+
+.field-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid #e4e4e4;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.field-title {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.field-subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+/* formulario */
+.field-form p {
+    margin-bottom: 16px;
+}
+
+.field-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.field-form input:focus {
+    border-color: #ffb503;
+    box-shadow: 0 0 4px rgba(255,181,3,0.4);
+}
+
+.field-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* texto botón */
+.field-register {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.field-register a {
+    color: #ffb503;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.field-register a:hover {
+    text-decoration: underline;
+}
+
+/*fondo form */
+.field-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: url('/static/img/LazzoBackground.png') no-repeat center center/cover;
+    position: relative;
+}
+
+/* Capa sobre la imagen*/
+.field-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.field-card {
+    position: relative;
+    z-index: 2;
+}
+
+.register-adjust {
+    margin-top: 90px
+}
+
+.back-home-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    display: inline-block;
+    padding: 8px 14px;
+
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+
+    transition: 0.25s ease;
+    z-index: 20;
+}
+
+.back-home-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+}
+
+.form-error {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background-color: #ffebee;
+    color: #c62828;
+    font-size: 0.9rem;
+    border: 1px solid #ffcdd2;
+}
+
+/* Card de éxito reutilizando el diseño de field-card */
+.success-card {
+    max-width: 420px;
+    text-align: center;
+    padding: 32px 28px;
+}
+
+/* Botón grande en pantalla de éxito */
+.success-btn {
+    display: block;
+    margin: 20px auto 0 auto;
+    padding: 10px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    background-color: #ffb503;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.success-btn:hover {
+    background-color: #ffca4d;
+}

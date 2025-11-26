@@ -10,32 +10,64 @@ from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm
 #------------Usuarios---------------
 
 def registro(request):
+    error_message = None
+
     if request.method == "POST":
         form = RegistroForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponse("Registro completado con éxito")
+            # Pantalla de éxito
+            return render(
+                request,
+                "form_success.html",
+                {
+                    "title": "Registro",
+                    "message": "Tu cuenta ha sido creada correctamente.",
+                },
+            )
+        else:
+            error_message = "Hay errores en el formulario. Revisa los campos marcados."
     else:
         form = RegistroForm()
 
-    return render(request, "registro.html", {"form": form})
+    return render(request, "registro.html", {"form": form, "error_message": error_message})
 
 def login(request):
+    error_message = None
+
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
             correo = form.cleaned_data["correo"]
             contrasena = form.cleaned_data["contrasena"]
 
-            usuario = Usuario.objects.filter(correo=correo, contrasena=contrasena).first()
+            usuario = Usuario.objects.filter(
+                correo=correo,
+                contrasena=contrasena
+            ).first()
 
             if usuario:
+                # GUARDAR SESIÓN
                 request.session["usuario_id"] = usuario.idUsuario
-                return HttpResponse("Inicio de sesión correcto")
-            else:
-                return HttpResponse("Credenciales inválidas")
+                request.session["usuario_nombre"] = usuario.nombre_completo
+                request.session["usuario_rol"] = usuario.rol
 
-    return render(request, "login.html", {"form": LoginForm()})
+                return render(
+                    request,
+                    "form_success.html",
+                    {
+                        "title": "Inicio de sesión",
+                        "message": "Has iniciado sesión correctamente.",
+                    },
+                )
+            else:
+                error_message = "Correo o contraseña incorrectos."
+        else:
+            error_message = "Revisa los campos del formulario."
+    else:
+        form = LoginForm()
+
+    return render(request, "login.html", {"form": form, "error_message": error_message})
 
 def logout(request):
     if "usuario_id" in request.session:
@@ -215,7 +247,3 @@ def notificaciones_ver(request):
 
     notis = Notificacion.objects.filter(usuario_id=usuario_id)
     return render(request, "notificaciones.html", {"notificaciones": notis})
-
-
-
-

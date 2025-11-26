@@ -1,0 +1,56 @@
+{% extends "base_form.html" %}
+
+{% block title %}
+<title>Registro - Lazzo</title>
+{% endblock %}
+
+{% block content %}
+<div class="register-adjust">
+    <div class="field-card">
+
+        <h2 class="field-title">Crear cuenta</h2>
+        <p class="field-subtitle">Completa tus datos para continuar</p>
+
+        {% if error_message %}
+        <p class="form-error">{{ error_message }}</p>
+        {% endif %}
+
+        <form method="post" class="field-form register-form">
+            {% csrf_token %}
+
+            <p>
+                <label for="id_nombre_completo">Nombre completo:</label>
+                <input type="text" name="nombre_completo" id="id_nombre_completo" required>
+            </p>
+
+            <p>
+                <label for="id_correo">Correo electrónico:</label>
+                <input type="email" name="correo" id="id_correo" required>
+            </p>
+
+            <p>
+                <label for="id_contrasena">Contraseña:</label>
+                <input type="password" name="contrasena" id="id_contrasena" required>
+            </p>
+
+            <p>
+                <label for="id_rol">Rol:</label>
+                <select name="rol" id="id_rol" class="field-select" required>
+                    <option value="">-- Selecciona un rol --</option>
+                    <option value="cliente">Cliente</option>
+                    <option value="vendedor">Vendedor</option>
+                </select>
+            </p>
+
+            <button type="submit" class="btn-primary field-btn">Registrarse</button>
+        </form>
+
+        <p class="field-register">
+            ¿Ya tienes cuenta?
+            <a href="/login/">Inicia sesión</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+    <title>Iniciar sesión - Lazzo</title>
+    {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}">
+</head>
+
+<body>
+    <div class="field-wrapper">
+        <a href="/" class="back-home-btn">⟵ Volver al inicio</a>
+
+    {% block content %}
+
+    {% endblock %}
+    </div>
+</body>
+</html>
