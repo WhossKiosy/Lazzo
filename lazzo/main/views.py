@@ -47,7 +47,6 @@ def login(request):
             ).first()
 
             if usuario:
-                # GUARDAR SESIÓN
                 request.session["usuario_id"] = usuario.idUsuario
                 request.session["usuario_nombre"] = usuario.nombre_completo
                 request.session["usuario_rol"] = usuario.rol
@@ -70,15 +69,32 @@ def login(request):
     return render(request, "login.html", {"form": form, "error_message": error_message})
 
 def logout(request):
-    if "usuario_id" in request.session:
-        del request.session["usuario_id"]
+    request.session.flush()
     django_logout(request)
-    return HttpResponse("Sesión cerrada correctamente")
+    return redirect("/")
+
+def mi_cuenta(request):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    pedidos_recientes = Pedido.objects.filter(usuario=usuario).order_by("-fecha")[:5]
+
+    return render(
+        request,
+        "mi_cuenta.html",
+        {
+            "usuario": usuario,
+            "pedidos_recientes": pedidos_recientes,
+        },
+    )
+
 
 #-----------PRODUCTOS----------------
 
 def home(request):
-    productos = Producto.objects.all()
+    productos = Producto.objects.all().order_by('-idProducto')
     return render(request, "home.html", {"productos": productos})
 
 def producto_detalle(request, id):
@@ -86,25 +102,31 @@ def producto_detalle(request, id):
     return render(request, "producto_detalle.html", {"producto": producto})
 
 def producto_crear(request):
+    # solo usuarios logueados pueden crear productos
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    vendedor = Usuario.objects.get(idUsuario=usuario_id)
+
     if request.method == "POST":
-        form = ProductoForm(request.POST)
+        form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             nuevo = form.save(commit=False)
-            usuario_id = request.session.get("usuario_id")
-            if not usuario_id:
-                return HttpResponse("Debes iniciar sesión.")
-            
-            vendedor = Usuario.objects.get(idUsuario=usuario_id)
             nuevo.vendedor = vendedor
             nuevo.save()
-
             return redirect("home")
-        else:
-            form = ProductoForm()
+    else:
+        form = ProductoForm()
 
-        return render(request, "producto_form.html", {"form": form})
+    return render(request, "producto_form.html", {"form": form})
 
-#-----------CARRITO----------------
+def producto_detalle(request, id):
+    producto = Producto.objects.get(idProducto=id)
+    return render(request, "producto_detalle.html", {"producto": producto})
+
+
+#-----------CARRITO---------------- 
 
 def carrito_ver(request):
     usuario_id = request.session.get("usuario_id")
@@ -114,7 +136,27 @@ def carrito_ver(request):
     usuario = Usuario.objects.get(idUsuario=usuario_id)
     carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
 
-    return render(request, "carrito.html",{"carrito": carrito})
+    # subtotales y total actualizado
+    for obj in carrito.objetos.all():
+        obj.calcular_subtotal()
+    carrito.calcular_total()
+
+    objetos = carrito.objetos.select_related("producto")
+
+    # costo de envío
+    shipping_cost = 2990 if carrito.total > 0 else 0
+    total_con_envio = carrito.total + shipping_cost
+
+    return render(
+        request,
+        "carrito.html",
+        {
+            "carrito": carrito,
+            "objetos": objetos,
+            "shipping_cost": shipping_cost,
+            "total_con_envio": total_con_envio,
+        },
+    )
 
 def carrito_agregar(request, producto_id):
     usuario_id = request.session.get("usuario_id")
@@ -138,17 +180,49 @@ def carrito_agregar(request, producto_id):
     
     carrito.calcular_total()
 
-    return redirect("carrito")
+    return redirect("cart")
 
 def carrito_eliminar(request, objeto_id):
     usuario_id = request.session.get("usuario_id")
     if not usuario_id:
         return redirect("login")
     
-    objeto = ObjetoCarrito.objects.get(idObjeto=objeto_id)
-    objeto.delete()
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    carrito = Carrito.objects.filter(usuario=usuario).first()
+    if not carrito:
+        return redirect("cart")
 
-    return redirect("carrito")
+    objeto = carrito.objetos.get(idObjeto=objeto_id)
+
+    # lo quita del carrito
+    carrito.objetos.remove(objeto)  
+    # y lo elimina
+    objeto.delete()                 
+    # actualiza total
+    carrito.calcular_total()        
+
+    return redirect("cart")
+
+def carrito_actualizar(request, objeto_id):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    if request.method == "POST":
+        cantidad = int(request.POST.get("cantidad", 1))
+        if cantidad < 1:
+            cantidad = 1
+
+        usuario = Usuario.objects.get(idUsuario=usuario_id)
+        carrito = Carrito.objects.get(usuario=usuario)
+
+        objeto = carrito.objetos.get(idObjeto=objeto_id)
+        objeto.cantidad = cantidad
+        objeto.calcular_subtotal()
+
+        carrito.calcular_total()
+
+    return redirect("cart")
 
 #-----------PEDIDOS----------------
 

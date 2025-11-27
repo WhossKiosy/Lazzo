@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Lazzo{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Top bar -->
+    <div class="top-bar">
+    <div class="container top-bar-content">
+        <div>
+            <a href="#">Ayuda</a>
+            <a href="#">Seguimiento de compra</a>
+            <a href="#">Sucursales</a>
+        </div>
+
+        <div>
+            {% if request.session.usuario_id %}
+                <div class="user-menu">
+                    <button type="button" class="user-menu-toggle">
+                        <img src="{% static 'img/user.png' %}" alt="user" width="20">
+                        <span class="header-user">
+                            Hola, {{ request.session.usuario_nombre }}
+                        </span>
+                        <span class="user-menu-caret">▾</span>
+                    </button>
+
+                    <div class="user-menu-dropdown">
+                        <div class="user-menu-header">
+                            <strong>{{ request.session.usuario_nombre }}</strong>
+                            <span class="user-menu-role">
+                                {{ request.session.usuario_rol|title }}
+                            </span>
+                        </div>
+
+                        <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Mi cuenta</a>
+                        <a href="{% url 'pedidos' %}" class="user-menu-link">Mis pedidos</a>
+                        <a href="{% url 'mensajes' %}" class="user-menu-link">Mensajes</a>
+                        <a href="{% url 'notificaciones' %}" class="user-menu-link">Notificaciones</a>
+
+                        {% if request.session.usuario_rol == 'vendedor' %}
+                            <a href="{% url 'producto_crear' %}" class="user-menu-link">
+                                Añadir producto
+                            </a>
+                        {% endif %}
+
+                        <form method="post" action="{% url 'logout' %}" class="user-menu-logout">
+                            {% csrf_token %}
+                            <button type="submit" class="user-menu-logout-btn">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}">Iniciar sesión</a>
+                <a href="{% url 'registro' %}">Crear cuenta</a>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Header principal -->
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo">
+                <a href="{% url 'home' %}">Lazzo</a>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" placeholder="¿Qué estás buscando?">
+                <button>Buscar</button>
+            </div>
+
+            <div class="header-icons">
+                <a href="#" class="header-icon">Mis compras</a>
+                <a href="#" class="header-icon">Favoritos</a>
+                <a href="{% url 'cart' %}" class="header-icon cart-icon">Carro (0)</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menú de categorías -->
+    <nav class="main-nav">
+        <div class="container nav-content">
+            <a href="#">Productos</a>
+            <a href="#">Servicios</a>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO VARIABLE -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <div class="footer-column">
+                <h4>Atención al cliente</h4>
+                <a href="#">Preguntas frecuentes</a>
+                <a href="#">Términos y condiciones</a>
+                <a href="#">Política de privacidad</a>
+            </div>
+            <div class="footer-column">
+                <h4>Sobre nosotros</h4>
+                <a href="#">Quiénes somos</a>
+                <a href="#">Trabaja con nosotros</a>
+                <a href="#">Sostenibilidad</a>
+            </div>
+            <div class="footer-column">
+                <h4>Medios de pago</h4>
+                <p>Visa, Mastercard, Débito, etc.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Suscríbete</h4>
+                <p>Recibe ofertas y novedades en tu correo.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Ingresa tu correo">
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2025 Marketplace Lazzo.</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menu = document.querySelector('.user-menu');
+        if (!menu) return;
+
+        const toggle = menu.querySelector('.user-menu-toggle');
+
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            menu.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function () {
+            menu.classList.remove('open');
+        });
+    });
+    </script>
+    {% endblock %}
+
+</body>
+</html>

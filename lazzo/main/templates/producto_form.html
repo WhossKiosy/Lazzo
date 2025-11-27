@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Añadir producto - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Añadir nuevo producto</h2>
+        </div>
+
+        <div class="account-card" style="max-width: 600px;">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                <p>
+                    <label for="{{ form.nombre.id_for_label }}">Nombre</label><br>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </p>
+
+                <p>
+                    <label for="{{ form.descripcion.id_for_label }}">Descripción</label><br>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </p>
+
+                <p>
+                    <label for="{{ form.precio.id_for_label }}">Precio</label><br>
+                    {{ form.precio }}
+                    {{ form.precio.errors }}
+                </p>
+
+                <p>
+                    <label for="{{ form.stock.id_for_label }}">Stock</label><br>
+                    {{ form.stock }}
+                    {{ form.stock.errors }}
+                </p>
+
+                <p>
+                    <label for="{{ form.categoria.id_for_label }}">Categoría</label><br>
+                    {{ form.categoria }}
+                    {{ form.categoria.errors }}
+                </p>
+
+                <p>
+                    <label for="{{ form.imagen.id_for_label }}">Imagen del producto</label><br>
+                    {{ form.imagen }}
+                    {{ form.imagen.errors }}
+                    <small style="font-size: 0.8rem; color:#777;">
+                        Formatos permitidos: JPG, JPEG, PNG, GIF.
+                    </small>
+                </p>
+
+                <br>
+                <button type="submit" class="btn-primary">
+                    Guardar producto
+                </button>
+                <a href="{% url 'home' %}" class="btn-secondary" style="margin-left: 8px;">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -46,6 +46,12 @@ body {
     text-decoration: underline;
 }
 
+.header-user {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
 /* Header principal */
 .main-header {
     background-color: #ffffff;
@@ -184,13 +190,13 @@ body {
 .hero-image {
     flex: 1;
     border-radius: 30px;
-    overflow: hidden;            /* recorta la imagen dentro del borde */
+    overflow: hidden;
 }
 
 .hero-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;           /* mantiene proporción sin deformar */
+    object-fit: cover;
     display: block;
 }
 
@@ -257,6 +263,10 @@ body {
     gap: 16px;
 }
 
+.products-grid-single {
+    max-width: 320px;
+    margin: 0 auto;
+}
 
 .product-card {
     background-color: #ffffff;
@@ -268,26 +278,24 @@ body {
     border: 1px solid #e4e4e4;
 }
 
-
-/* Imagen de producto con bordes redondeados */
 .product-image {
     position: relative;
     width: 100%;
-    height: 260px;          /* puedes probar 220–260px */
+    max-width: 280px;
+    height: 260px;
     border-radius: 12px;
-    overflow: hidden;       /* recorta las esquinas y el exceso de imagen */
-    margin-bottom: 8px;
+    overflow: hidden;
+    margin: 0 auto 8px auto;
 }
 
 .product-image img {
     position: absolute;
-    inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;      /* mantiene proporción sin deformar */
+    object-fit: cover;
     display: block;
 }
-
 
 .product-title {
     font-size: 0.95rem;
@@ -469,16 +477,29 @@ body {
     }
 }
 
-/* field styles */
+/* FORMULARIOS (login / registro / éxito) */
+
+/* Wrapper general de formularios */
 .field-wrapper {
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f5f5f7;
     padding: 20px;
+
+    background: url('/static/img/LazzoBackground.png') no-repeat center center/cover;
+    position: relative;
 }
 
+/* Capa sobre la imagen */
+.field-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* Card de formulario */
 .field-card {
     width: 100%;
     max-width: 420px;
@@ -487,6 +508,9 @@ body {
     border-radius: 16px;
     border: 1px solid #e4e4e4;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+
+    position: relative;
+    z-index: 2;
 }
 
 .field-title {
@@ -502,12 +526,13 @@ body {
     font-size: 0.95rem;
 }
 
-/* formulario */
+/* formulario interno */
 .field-form p {
     margin-bottom: 16px;
 }
 
-.field-form input {
+.field-form input,
+.field-form select {
     width: 100%;
     padding: 10px 12px;
     border-radius: 8px;
@@ -516,9 +541,20 @@ body {
     outline: none;
 }
 
-.field-form input:focus {
+.field-form input:focus,
+.field-form select:focus {
     border-color: #ffb503;
     box-shadow: 0 0 4px rgba(255,181,3,0.4);
+}
+
+/* select de rol */
+.field-select {
+    width: 100%;
+}
+
+/* por si quieres ajustar algo especial al form de registro */
+.register-form {
+    margin-top: 4px;
 }
 
 .field-btn {
@@ -528,7 +564,7 @@ body {
     font-size: 1rem;
 }
 
-/* texto botón */
+/* texto bajo el formulario */
 .field-register {
     margin-top: 16px;
     text-align: center;
@@ -545,34 +581,12 @@ body {
     text-decoration: underline;
 }
 
-/*fondo form */
-.field-wrapper {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: url('/static/img/LazzoBackground.png') no-repeat center center/cover;
-    position: relative;
-}
-
-/* Capa sobre la imagen*/
-.field-wrapper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-}
-
-.field-card {
-    position: relative;
-    z-index: 2;
-}
-
+/* Ajuste para centrar mejor el registro respecto al botón volver */
 .register-adjust {
-    margin-top: 90px
+    margin-top: 90px;
 }
 
+/* Botón "Volver al inicio" */
 .back-home-btn {
     position: absolute;
     top: 20px;
@@ -601,6 +615,7 @@ body {
     box-shadow: 0 5px 12px rgba(0,0,0,0.12);
 }
 
+/* Mensaje de error */
 .form-error {
     width: 100%;
     padding: 10px 12px;
@@ -610,13 +625,6 @@ body {
     color: #c62828;
     font-size: 0.9rem;
     border: 1px solid #ffcdd2;
-}
-
-/* Card de éxito reutilizando el diseño de field-card */
-.success-card {
-    max-width: 420px;
-    text-align: center;
-    padding: 32px 28px;
 }
 
 /* Botón grande en pantalla de éxito */
@@ -638,3 +646,376 @@ body {
 .success-btn:hover {
     background-color: #ffca4d;
 }
+
+/*carrito*/
+
+.cart-section {
+    margin-top: 16px;
+}
+
+.cart-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2.3fr) minmax(280px, 1fr);
+    gap: 24px;
+}
+
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) 120px;
+    gap: 12px;
+    align-items: center;
+}
+
+.cart-item-image {
+    height: 120px;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cart-item-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.cart-item-form input[type="number"] {
+    width: 70px;
+    padding: 4px 6px;
+}
+
+/* sidebar detalle compra */
+.cart-summary {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 1px solid #e4e4e4;
+    font-size: 0.9rem;
+}
+
+.cart-summary h3 {
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+}
+
+.cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 6px 0;
+}
+
+.cart-summary-product {
+    font-weight: 500;
+}
+
+.cart-summary-total {
+    margin-top: 8px;
+    font-weight: 700;
+}
+
+.cart-checkout-btn {
+    width: 100%;
+    margin-top: 14px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .cart-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .cart-item {
+        grid-template-columns: 100px minmax(0, 1fr);
+        grid-template-rows: auto auto;
+    }
+
+    .cart-item-subtotal {
+        justify-self: flex-end;
+    }
+}
+
+/* menu top bar*/
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.user-menu-toggle img {
+    border-radius: 50%;
+}
+
+.header-user-text {
+    font-weight: 600;
+}
+
+.user-menu-caret {
+    font-size: 0.7rem;
+}
+
+.user-menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 210px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e4e4e4;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    padding: 10px 0;
+    display: none;
+    z-index: 100;
+}
+
+.user-menu.open .user-menu-dropdown {
+    display: block;
+}
+
+.user-menu-header {
+    padding: 6px 14px 8px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 4px;
+}
+
+.user-menu-role {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.user-menu-link {
+    display: block;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #333;
+}
+
+.user-menu-link:hover {
+    background-color: #fff8e0;
+    color: #ffb503;
+}
+
+.user-menu-logout {
+    padding: 6px 14px 2px 14px;
+    margin-top: 4px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.user-menu-logout-btn {
+    width: 100%;
+    padding: 6px 0;
+    border-radius: 6px;
+    border: none;
+    background-color: #ffb503;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.user-menu-logout-btn:hover {
+    background-color: #ffca4d;
+}
+
+/*Mi cuenta */
+.account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.account-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e4e4e4;
+    font-size: 0.9rem;
+}
+
+.account-orders {
+    list-style: none;
+    padding-left: 0;
+}
+
+.account-orders li {
+    margin-bottom: 4px;
+}
+
+.table-basic {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e4e4e4;
+}
+
+.table-basic th,
+.table-basic td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+}
+
+.table-basic thead {
+    background-color: #fafafa;
+    font-weight: 600;
+}
+
+.table-basic tr:last-child td {
+    border-bottom: none;
+}
+
+.badge-success {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: #4caf50;
+    color: #fff;
+    font-size: 0.75rem;
+}
+
+.product-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr);
+    gap: 24px;
+    align-items: flex-start;
+    margin-top: 16px;
+}
+
+.product-detail-image {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.product-detail-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-detail-title {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+}
+
+.product-detail-category {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.product-detail-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.product-detail-stock {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.product-detail-description {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.product-detail-seller {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.product-detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+    .product-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .product-detail-image {
+        max-width: 320px;
+    }
+}
+
+/* botones dentro de la tarjeta */
+.product-card .product-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* pill centrados*/
+.product-card .product-actions .btn-primary,
+.product-card .product-actions .btn-secondary {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+
+.product-card .product-actions .btn-secondary {
+    background-color: #ffffff;
+    border-color: #ffb503;
+    color: #ffb503;
+    font-weight: 500;
+}
+
+/* Hover secundario */
+.product-card .product-actions .btn-secondary:hover {
+    background-color: #fff4d1;
+}
+
+.product-card .product-actions .btn-primary {
+    background-color: #ffb503;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Hover primario */
+.product-card .product-actions .btn-primary:hover {
+    background-color: #ffc52f;
+}
+

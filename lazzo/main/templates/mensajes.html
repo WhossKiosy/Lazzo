@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mensajes - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Mensajes</h2>
+            <a href="{% url 'mensaje_enviar' %}" class="btn-secondary">
+                Nuevo mensaje
+            </a>
+        </div>
+
+        <div class="account-grid">
+            <div class="account-card">
+                <h3>Recibidos</h3>
+                {% if recibidos %}
+                    <ul class="account-orders">
+                        {% for mensaje in recibidos %}
+                            <li>
+                                <strong>De:</strong> {{ mensaje.emisor.nombre_completo }}<br>
+                                <small>{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</small><br>
+                                {{ mensaje.contenido }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No tienes mensajes recibidos.</p>
+                {% endif %}
+            </div>
+
+            <div class="account-card">
+                <h3>Enviados</h3>
+                {% if enviados %}
+                    <ul class="account-orders">
+                        {% for mensaje in enviados %}
+                            <li>
+                                <strong>Para:</strong> {{ mensaje.receptor.nombre_completo }}<br>
+                                <small>{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</small><br>
+                                {{ mensaje.contenido }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No has enviado mensajes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

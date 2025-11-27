@@ -1,57 +1,9 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Home - Lazzo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}">
-</head>
-<body>
 
-    <!-- Top bar -->
-    <div class="top-bar">
-        <div class="container top-bar-content">
-            <div class="top-bar-left">
-                <a href="#">Ayuda</a>
-                <a href="#">Seguimiento de compra</a>
-                <a href="#">Sucursales</a>
-            </div>
-            <div class="top-bar-right">
-                <a href="login">Iniciar sesión</a>
-                <a href="registro">Crear cuenta</a>
-            </div>
-        </div>
-    </div>
+{% block title %}Home - Lazzo{% endblock %}
 
-    <!-- Header principal -->
-    <header class="main-header">
-        <div class="container header-content">
-            <div class="logo">
-                <a href="#">Lazzo</a>
-            </div>
-
-            <div class="search-bar">
-                <input type="text" placeholder="¿Qué estás buscando?">
-                <button>Buscar</button>
-            </div>
-
-            <div class="header-icons">
-                <a href="#" class="header-icon">Mis compras</a>
-                <a href="#" class="header-icon">Favoritos</a>
-                <a href="#" class="header-icon cart-icon">Carro (0)</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Menú de categorías -->
-    <nav class="main-nav">
-        <div class="container nav-content">
-            <a href="#">Productos</a>
-            <a href="#">Servicios</a>
-        </div>
-    </nav>
+{% block content %}
 
     <!-- Banner principal -->
     <section class="hero">
@@ -89,74 +41,8 @@
         </div>
     </section>
 
-    <!-- Productos destacados -->
-    <section class="products-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Productos destacados</h2>
-                <a href="#" class="see-all">Ver todos</a>
-            </div>
-
-            <div class="products-grid">
-                <!-- Tarjeta 1 -->
-                <article class="product-card">
-                    <div class="product-image">
-                        <img src="{% static 'img/hoodie.jpeg' %}" alt="Hoodie negro">
-                    </div>
-                    <h3 class="product-title">Hoodie Cybersigilsm</h3>
-                    <p class="product-brand">Divinity Breeze</p>
-                    <div class="product-prices">
-                        <span class="current-price">$44.990</span>
-                        <span class="old-price">$54.990</span>
-                    </div>
-                    <button class="btn-secondary">Agregar al carro</button>
-                </article>
-
-                <!-- Tarjeta 2 -->
-                <article class="product-card">
-                    <div class="product-image">
-                        <img src="{% static 'img/chain.jpeg' %}" alt="Cadena">
-                    </div>
-                    <h3 class="product-title">Cadena de cruz</h3>
-                    <p class="product-brand">Chrome Heart</p>
-                    <div class="product-prices">
-                        <span class="current-price">$24.990</span>
-                        <span class="old-price">$29.990</span>
-                    </div>
-                    <button class="btn-secondary">Agregar al carro</button>
-                </article>
-
-                <!-- Tarjeta 3 -->
-                <article class="product-card">
-                    <div class="product-image">
-                        <img src="{% static 'img/manga.webp' %}" alt="Manga">
-                    </div>
-                    <h3 class="product-title">Manga Chainsaw Man Ivrea Tomo 1</h3>
-                    <p class="product-brand">Ivrea</p>
-                    <div class="product-prices">
-                        <span class="current-price">$9.490</span>
-                        <span class="old-price">$9.990</span>
-                    </div>
-                    <button class="btn-secondary">Agregar al carro</button>
-                </article>
-
-                <!-- Tarjeta 4 -->
-                <article class="product-card">
-                    <div class="product-image">
-                        <img src="{% static 'img/whitemonster.jpeg' %}" alt="Monster blanco">
-                    </div>
-                    <h3 class="product-title">Monster Ultra Sin Calorías 6 x 473 ml</h3>
-                    <p class="product-brand">Monster Energy</p>
-                    <div class="product-prices">
-                        <span class="current-price">$11.500</span>
-                        <span class="old-price">$13.500</span>
-                    </div>
-                    <button class="btn-secondary">Agregar al carro</button>
-                </article>
-            </div>
-        </div>
-    </section>
-
+        <!-- Productos destacados -->
+    {% include "destacados.html" %}
 
     <!-- Categorías destacadas -->
     <section class="categories-section">
@@ -181,40 +67,4 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="container footer-content">
-            <div class="footer-column">
-                <h4>Atención al cliente</h4>
-                <a href="#">Preguntas frecuentes</a>
-                <a href="#">Términos y condiciones</a>
-                <a href="#">Política de privacidad</a>
-            </div>
-            <div class="footer-column">
-                <h4>Sobre nosotros</h4>
-                <a href="#">Quiénes somos</a>
-                <a href="#">Trabaja con nosotros</a>
-                <a href="#">Sostenibilidad</a>
-            </div>
-            <div class="footer-column">
-                <h4>Medios de pago</h4>
-                <p>Visa, Mastercard, Débito, etc.</p>
-            </div>
-            <div class="footer-column">
-                <h4>Suscríbete</h4>
-                <p>Recibe ofertas y novedades en tu correo.</p>
-                <form class="newsletter-form">
-                    <input type="email" placeholder="Ingresa tu correo">
-                    <button type="submit">Enviar</button>
-                </form>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="container">
-                <p>© 2025 Marketplace Lazzo.</p>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+{% endblock %}

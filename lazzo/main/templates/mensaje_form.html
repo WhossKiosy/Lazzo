@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nuevo mensaje - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <h2>Enviar mensaje</h2>
+
+        <div class="account-card" style="max-width: 520px;">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="btn-primary">
+                    Enviar
+                </button>
+                <a href="{% url 'mensajes' %}" class="btn-secondary" style="margin-left: 8px;">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

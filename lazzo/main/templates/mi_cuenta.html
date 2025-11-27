@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi cuenta - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <h2>Mi cuenta</h2>
+
+        <div class="account-grid">
+            <div class="account-card">
+                <h3>Datos personales</h3>
+                <p><strong>Nombre:</strong> {{ usuario.nombre_completo }}</p>
+                <p><strong>Correo:</strong> {{ usuario.correo }}</p>
+                <p><strong>Rol:</strong> {{ usuario.rol|title }}</p>
+                <p><strong>Registrado el:</strong> {{ usuario.fecha_registro|date:"d/m/Y H:i" }}</p>
+            </div>
+
+            <div class="account-card">
+                <h3>Pedidos recientes</h3>
+                {% if pedidos_recientes %}
+                    <ul class="account-orders">
+                        {% for pedido in pedidos_recientes %}
+                            <li>
+                                Pedido #{{ pedido.idPedido }} 
+                                {{ pedido.fecha|date:"d/m/Y" }} 
+                                ${{ pedido.total }} 
+                                Estado: {{ pedido.estado }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No tienes pedidos aún.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

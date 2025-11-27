@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ producto.nombre }} - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container product-detail-layout">
+
+        <!-- Columna izquierda: imagen -->
+        <div class="product-detail-image">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            {% else %}
+                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+            {% endif %}
+        </div>
+
+        <!-- Columna derecha: info -->
+        <div class="product-detail-info">
+            <h1 class="product-detail-title">{{ producto.nombre }}</h1>
+
+            <p class="product-detail-category">
+                {{ producto.categoria }}
+            </p>
+
+            <p class="product-detail-price">
+                ${{ producto.precio }}
+            </p>
+
+            <p class="product-detail-stock">
+                Stock disponible: {{ producto.stock }}
+            </p>
+
+            <p class="product-detail-description">
+                {{ producto.descripcion }}
+            </p>
+
+            <p class="product-detail-seller">
+                Vendido por: <strong>{{ producto.vendedor.nombre_completo }}</strong>
+            </p>
+
+            <br>
+
+            <div class="product-actions">
+                <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
+                    Agregar al carro
+                </a>
+
+                <a href="{% url 'home' %}" class="btn-secondary">
+                    Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

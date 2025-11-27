@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 
 
 class Usuario(models.Model):
@@ -25,7 +26,12 @@ class Producto(models.Model):
     descripcion = models.TextField()
     precio = models.IntegerField()
     stock = models.IntegerField(default=1)
-    imagen = models.CharField(max_length=100)
+    imagen = models.ImageField(
+        upload_to='productos/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+        )
     categoria = models.CharField(max_length=50)
     vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="productos")
 

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pagar pedido - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <h2>Pagar pedido</h2>
+
+        <div class="account-card" style="max-width: 480px;">
+            <p><strong>Pedido:</strong> #{{ pedido.idPedido }}</p>
+            <p><strong>Fecha:</strong> {{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+            <p><strong>Total a pagar:</strong> ${{ pedido.total }}</p>
+            <p><strong>Estado actual:</strong> {{ pedido.estado }}</p>
+
+            <form method="post" style="margin-top: 16px;">
+                {% csrf_token %}
+                <label for="metodo">Método de pago</label>
+                <select name="metodo" id="metodo" class="field-select" style="margin: 8px 0 16px 0;">
+                    <option value="tarjeta">Tarjeta de crédito / débito</option>
+                    <option value="transferencia">Transferencia bancaria</option>
+                    <option value="webpay">Webpay</option>
+                </select>
+
+                <button type="submit" class="btn-primary">
+                    Confirmar pago
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

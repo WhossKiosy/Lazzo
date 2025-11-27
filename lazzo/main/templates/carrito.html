@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Carro de compras - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section cart-section">
+    <div class="container">
+
+        <div class="section-header">
+            <h2>Tu carrito</h2>
+            <a href="/" class="see-all">Seguir comprando</a>
+        </div>
+
+        {% if objetos %}
+            <div class="cart-layout">
+
+                <!-- LISTA DE PRODUCTOS -->
+                <div class="cart-items">
+                    {% for obj in objetos %}
+                        <article class="product-card cart-item">
+
+                            <div class="product-image cart-item-image">
+                                {% if obj.producto.imagen %}
+                                    <img src="{{ obj.producto.imagen.url }}" alt="{{ obj.producto.nombre }}">
+                                {% else %}
+                                    <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                                {% endif %}
+                            </div>
+
+                            <div class="cart-item-info">
+                                <h3 class="product-title">{{ obj.producto.nombre }}</h3>
+                                <p class="product-brand">{{ obj.producto.categoria }}</p>
+
+                                <div class="product-prices">
+                                    <span class="current-price">
+                                        ${{ obj.producto.precio }}
+                                    </span>
+                                </div>
+
+                                <form method="post"
+                                      action="{% url 'cart_update' obj.idObjeto %}"
+                                      class="cart-item-form">
+                                    {% csrf_token %}
+                                    <label for="qty-{{ obj.idObjeto }}">Cantidad</label>
+                                    <input type="number"
+                                           id="qty-{{ obj.idObjeto }}"
+                                           name="cantidad"
+                                           min="1"
+                                           value="{{ obj.cantidad }}">
+                                    <button type="submit" class="btn-secondary">
+                                        Actualizar
+                                    </button>
+                                </form>
+
+                                <form method="post"
+                                      action="{% url 'cart_delete' obj.idObjeto %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-secondary">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="cart-item-subtotal">
+                                <span>Subtotal</span>
+                                <strong>${{ obj.subtotal }}</strong>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                <!-- DETALLE DE LA COMPRA -->
+                <aside class="cart-summary">
+                    <h3>Detalle de la compra</h3>
+
+                    {% for obj in objetos %}
+                        <div class="cart-summary-row">
+                            <div>
+                                <span class="cart-summary-product">{{ obj.producto.nombre }}</span><br>
+                                <small>x{{ obj.cantidad }}</small>
+                            </div>
+                            <span>${{ obj.subtotal }}</span>
+                        </div>
+                    {% endfor %}
+
+                    <hr>
+
+                    <div class="cart-summary-row">
+                        <span>Subtotal</span>
+                        <span>${{ carrito.total }}</span>
+                    </div>
+
+                    <div class="cart-summary-row">
+                        <span>Envío</span>
+                        <span>
+                            {% if shipping_cost %}
+                                ${{ shipping_cost }}
+                            {% else %}
+                                Por calcular
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="cart-summary-row cart-summary-total">
+                        <span>Total a pagar</span>
+                        <span>${{ total_con_envio }}</span>
+                    </div>
+
+                    <form method="post" action="{% url 'crear_pedido' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-primary cart-checkout-btn">
+                            Continuar con la compra
+                        </button>
+                    </form>
+                </aside>
+
+            </div>
+        {% else %}
+            <p>Tu carrito está vacío.</p>
+            <br>
+            <a href="/" class="btn-secondary">Ver productos</a>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

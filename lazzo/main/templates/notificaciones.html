@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notificaciones - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Notificaciones</h2>
+        </div>
+
+        <div class="account-card">
+            {% if notificaciones %}
+                <ul class="account-orders">
+                    {% for noti in notificaciones %}
+                        <li>
+                            <strong>{{ noti.tipo }}</strong><br>
+                            <small>{{ noti.fecha|date:"d/m/Y H:i" }}</small><br>
+                            {{ noti.mensaje }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tienes notificaciones.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

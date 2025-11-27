@@ -1,0 +1,50 @@
+{# main/templates/productos_destacados_section.html #}
+{% load static %}
+
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Productos destacados</h2>
+            <a href="#" class="see-all">Ver todos</a>
+        </div>
+
+        {% with productos|length as total_productos %}
+            <div class="products-grid {% if total_productos == 1 %}products-grid-single{% endif %}">
+
+                {% for producto in productos|slice:":4" %}
+                    <article class="product-card">
+
+                        <div class="product-image">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                            {% endif %}
+                        </div>
+
+                        <h3 class="product-title">{{ producto.nombre }}</h3>
+                        <p class="product-brand">{{ producto.categoria }}</p>
+
+                        <div class="product-prices">
+                            <span class="current-price">${{ producto.precio }}</span>
+                        </div>
+
+                        <div class="product-actions">
+                            <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
+                                Ver detalles
+                            </a>
+
+                            <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
+                                Agregar al carro
+                            </a>
+                        </div>
+
+                    </article>
+                {% empty %}
+                    <p>No hay productos disponibles.</p>
+                {% endfor %}
+
+            </div>
+        {% endwith %}
+    </div>
+</section>

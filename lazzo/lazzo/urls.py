@@ -1,26 +1,46 @@
-"""
-URL configuration for lazzo project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from main import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home),
-    path('login/', views.login),
-    path('registro/', views.registro)
+
+    # Home
+    path('', views.home, name="home"),
+
+    # Autenticación
+    path('login/', views.login, name="login"),
+    path('signup/', views.registro, name="registro"),
+    path('logout/', views.logout, name="logout"),
+
+    # Carrito
+    path("cart/", views.carrito_ver, name="cart"),
+    path("cart/add/<int:producto_id>/", views.carrito_agregar, name="cart_add"),
+    path("cart/update/<int:objeto_id>/", views.carrito_actualizar, name="cart_update"),
+    path("cart/delete/<int:objeto_id>/", views.carrito_eliminar, name="cart_delete"),
+
+    # Cuenta del usuario
+    path("account/", views.mi_cuenta, name="mi_cuenta"),
+
+    # Pedidos
+    path("pedidos/", views.pedidos_ver, name="pedidos"),
+    path("pedido/crear/", views.crear_pedido, name="crear_pedido"),
+    path("pedido/pagar/<int:pedido_id>/", views.pagar, name="pagar"),
+
+    # Mensajes
+    path("mensajes/", views.mensajes_ver, name="mensajes"),
+    path("mensajes/enviar/", views.mensaje_enviar, name="mensaje_enviar"),
+
+    # Notificaciones
+    path("notificaciones/", views.notificaciones_ver, name="notificaciones"),
+
+    # Productos (solo vendedor)
+    path("producto/nuevo/", views.producto_crear, name="producto_crear"),
+    path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
