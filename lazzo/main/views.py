@@ -148,6 +148,46 @@ def vendedor_perfil(request, vendedor_id):
     })
 
 
+#-----------SERVICIOS----------------
+
+def home(request):
+    query = request.GET.get("q", "").strip()  # texto buscado
+
+    if query:
+        servicios = Servicio.objects.filter(nombre__icontains=query).order_by("-idServicio")
+    else:
+        servicios = Servicio.objects.all().order_by("-idServicio")
+
+    return render(request, "home.html", {
+        "servicios": servicios,
+        "query": query,
+    })
+
+def servicio_detalle(request, id):
+    servicio = Servicio.objects.get(idServicio=id)
+    return render(request, "servicio_detalle.html", {"servicio": servicio})
+
+def servicio_crear(request):
+    # solo usuarios logueados pueden crear servicios
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    vendedor = Usuario.objects.get(idUsuario=usuario_id)
+
+    if request.method == "POST":
+        form = ServicioForm(request.POST, request.FILES)
+        if form.is_valid():
+            nuevo = form.save(commit=False)
+            nuevo.vendedor = vendedor
+            nuevo.save()
+            return redirect("home")
+    else:
+        form = ServicioForm()
+
+    return render(request, "servicio_form.html", {"form": form})
+
+
 #-----------PRODUCTOS----------------
 
 def home(request):
