@@ -118,6 +118,26 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+class Favorito(models.Model):
+    idFavorito = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="favoritos"
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.CASCADE,
+        related_name="favoritos"
+    )
+    fecha = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("usuario", "producto")
+
+    def __str__(self):
+        return f"Favorito de {self.usuario} - {self.producto}"
+
 
 class ObjetoCarrito(models.Model):
     idObjeto = models.AutoField(primary_key=True)

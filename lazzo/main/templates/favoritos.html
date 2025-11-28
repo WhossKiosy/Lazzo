@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mis favoritos - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Mis favoritos</h2>
+        </div>
+
+        {% if productos %}
+            <div class="products-grid">
+                {% for producto in productos %}
+                    <article class="product-card">
+                        <div class="product-image">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                            {% endif %}
+                        </div>
+
+                        <h3 class="product-title">{{ producto.nombre }}</h3>
+                        <p class="product-brand">{{ producto.categoria }}</p>
+
+                        <div class="product-prices">
+                            <span class="current-price">${{ producto.precio }}</span>
+                        </div>
+
+                        <div class="product-actions">
+                            <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
+                                Ver detalles
+                            </a>
+                            <a href="{% url 'favorito_toggle' producto.idProducto %}" class="btn-primary">
+                                Quitar de favoritos
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No tienes productos en favoritos todavía.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

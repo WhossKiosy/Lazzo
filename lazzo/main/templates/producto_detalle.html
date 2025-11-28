@@ -51,6 +51,17 @@
                     Agregar al carro
                 </a>
 
+                {% if request.session.usuario_id %}
+                    <a href="{% url 'favorito_toggle' producto.idProducto %}"
+                    class="btn-secondary">
+                        {% if es_favorito %}
+                            Quitar de favoritos
+                        {% else %}
+                            Añadir a favoritos
+                        {% endif %}
+                    </a>
+                {% endif %}
+
                 <a href="{% url 'home' %}" class="btn-secondary">
                     Volver al inicio
                 </a>

@@ -4,7 +4,7 @@ from django.contrib.auth import logout as django_logout
 from .models import (
     Usuario, Producto, ObjetoCarrito, Carrito, Pedido, 
     Pago, Mensaje, Notificacion, Direccion, DetallePedido, 
-    Servicio, TIPOS_PRODUCTO, CATEGORIAS_PRODUCTO, CATEGORIAS_SERVICIO)
+    Servicio, Favorito, TIPOS_PRODUCTO, CATEGORIAS_PRODUCTO, CATEGORIAS_SERVICIO)
 from django.contrib import messages
 from django.db.models import Q
 import random
@@ -44,7 +44,6 @@ def home(request):
     )
 
 
-
 def registro(request):
     error_message = None
 
@@ -67,6 +66,7 @@ def registro(request):
         form = RegistroForm()
 
     return render(request, "registro.html", {"form": form, "error_message": error_message})
+
 
 def login(request):
     error_message = None
@@ -104,10 +104,12 @@ def login(request):
 
     return render(request, "login.html", {"form": form, "error_message": error_message})
 
+
 def logout(request):
     request.session.flush()
     django_logout(request)
     return redirect("/")
+
 
 def mi_cuenta(request):
     usuario_id = request.session.get("usuario_id")
@@ -149,6 +151,7 @@ def mi_cuenta(request):
         },
     )
 
+
 def editar_perfil(request):
     usuario_id = request.session.get("usuario_id")
     if not usuario_id:
@@ -172,6 +175,7 @@ def editar_perfil(request):
         "usuario": usuario
     })
 
+
 def vendedor_perfil(request, vendedor_id):
     vendedor = Usuario.objects.get(idUsuario=vendedor_id)
     productos = Producto.objects.filter(vendedor=vendedor).order_by('-idProducto')
@@ -180,6 +184,49 @@ def vendedor_perfil(request, vendedor_id):
         "vendedor": vendedor,
         "productos": productos,
     })
+
+
+def favorito_toggle(request, producto_id):
+    """
+    Añade o quita un producto de los favoritos del usuario logueado.
+    """
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        messages.error(request, "Debes iniciar sesión para usar favoritos.")
+        return redirect("login")
+
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    producto = get_object_or_404(Producto, idProducto=producto_id)
+
+    favorito, creado = Favorito.objects.get_or_create(
+        usuario=usuario,
+        producto=producto
+    )
+
+    if creado:
+        messages.success(request, "Producto añadido a tus favoritos.")
+    else:
+        favorito.delete()
+        messages.info(request, "Producto eliminado de tus favoritos.")
+
+    return redirect("producto_detalle", id=producto.idProducto)
+
+
+def favoritos(request):
+    """
+    Lista de productos favoritos del usuario logueado.
+    """
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    favoritos_qs = Favorito.objects.filter(usuario=usuario).select_related("producto")
+
+    productos = [f.producto for f in favoritos_qs]
+
+    return render(request, "favoritos.html", {"productos": productos})
+
 
 #-----------CATEGORIAS----------------
 def categoria_filtrar(request, categoria):
@@ -280,8 +327,24 @@ def producto_crear(request):
     return render(request, "producto_form.html", {"form": form})
 
 def producto_detalle(request, id):
-    producto = Producto.objects.get(idProducto=id)
-    return render(request, "producto_detalle.html", {"producto": producto})
+    producto = get_object_or_404(Producto, idProducto=id)
+
+    es_favorito = False
+    usuario_id = request.session.get("usuario_id")
+    if usuario_id:
+        es_favorito = Favorito.objects.filter(
+            usuario_id=usuario_id,
+            producto=producto
+        ).exists()
+
+    return render(
+        request,
+        "producto_detalle.html",
+        {
+            "producto": producto,
+            "es_favorito": es_favorito,
+        },
+    )
 
 def productos_por_categoria(request, tipo, categoria_slug):
     # validar tipo

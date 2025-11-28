@@ -51,6 +51,9 @@ urlpatterns = [
     path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
     path("producto/<int:idProducto>/editar/", views.producto_editar, name="producto_editar"),
 
+    # Favoritos
+    path("favoritos/", views.favoritos, name="favoritos"),
+    path("favoritos/toggle/<int:producto_id>/", views.favorito_toggle, name="favorito_toggle"),
 
     # Perfil tienda/vendedor
     path("vendedor/<int:vendedor_id>/", views.vendedor_perfil, name="vendedor_perfil"),
