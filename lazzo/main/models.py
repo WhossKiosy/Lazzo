@@ -44,6 +44,25 @@ class Usuario(models.Model):
         return self.nombre_completo
 
 
+class Servicio(models.Model):
+    idServicio = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    precio = models.IntegerField()
+    imagen = models.ImageField(
+        upload_to=product_image_upload_path,
+        blank=True,
+        null=True
+    )
+
+    categoria = models.CharField(max_length=50)
+    vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="servicios")
+
+    def __str__(self):
+        return self.nombre
+
+
+
 class Producto(models.Model):
     idProducto = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
