@@ -49,6 +49,8 @@ urlpatterns = [
     # Productos (solo vendedor)
     path("producto/nuevo/", views.producto_crear, name="producto_crear"),
     path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
+    path("producto/<int:idProducto>/editar/", views.producto_editar, name="producto_editar"),
+
 
     # Perfil tienda/vendedor
     path("vendedor/<int:vendedor_id>/", views.vendedor_perfil, name="vendedor_perfil"),

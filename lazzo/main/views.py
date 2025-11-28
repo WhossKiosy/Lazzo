@@ -306,6 +306,39 @@ def productos_por_categoria(request, tipo, categoria_slug):
     return render(request, "categoria_list.html", contexto)
 
 
+def producto_editar(request, idProducto):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        messages.error(request, "Debes iniciar sesión.")
+        return redirect("login")
+
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+
+    try:
+        producto = Producto.objects.get(idProducto=idProducto)
+    except Producto.DoesNotExist:
+        messages.error(request, "El producto no existe.")
+        return redirect("vendedor_perfil", vendedor_id=usuario.idUsuario)
+
+    if producto.vendedor != usuario:
+        messages.error(request, "No tienes permiso para editar este producto.")
+        return redirect("vendedor_perfil", vendedor_id=producto.vendedor.idUsuario)
+
+    if request.method == "POST":
+        form = ProductoForm(request.POST, request.FILES, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Producto actualizado correctamente.")
+            return redirect("vendedor_perfil", vendedor_id=usuario.idUsuario)
+    else:
+        form = ProductoForm(instance=producto)
+
+    return render(request, "vendedor_editarPro.html", {
+        "form": form,
+        "producto": producto
+    })
+
+
 #-----------CARRITO---------------- 
 
 def carrito_ver(request):
