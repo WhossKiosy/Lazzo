@@ -39,8 +39,14 @@
                             </span>
                         </div>
 
-                        <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Mi cuenta</a>
+                        {# Perfil público (cliente o vendedor) #}
+                        <a href="{% url 'mi_perfil' %}" class="user-menu-link">Mi perfil</a>
+
+                        {# Configuración / edición de datos de cuenta #}
+                        <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Editar cuenta</a>
+
                         <a href="{% url 'pedidos' %}" class="user-menu-link">Mis compras</a>
+                        <a href="{% url 'favoritos' %}" class="user-menu-link">Favoritos</a>
                         <a href="{% url 'mensajes' %}" class="user-menu-link">Mensajes</a>
                         <a href="{% url 'notificaciones' %}" class="user-menu-link">Notificaciones</a>
 

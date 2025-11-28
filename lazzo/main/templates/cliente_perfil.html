@@ -1,0 +1,50 @@
+{# main/templates/cliente_perfil.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Perfil de {{ usuario.nombre_completo }} - Lazzo{% endblock %}
+
+{% block content %}
+
+<section class="seller-header">
+    <div class="container seller-banner">
+        
+        <div class="seller-avatar">
+            {% if usuario.foto %}
+                <img src="{{ usuario.foto.url }}" alt="{{ usuario.nombre_completo }}">
+            {% else %}
+                <span>{{ usuario.nombre_completo|first }}</span>
+            {% endif %}
+        </div>
+
+        <div class="seller-info">
+            <h1 class="seller-name">{{ usuario.nombre_completo }}</h1>
+            <p class="seller-role">
+                Cliente registrado en Lazzo
+            </p>
+
+            <p class="seller-description">
+                {% if usuario.descripcion %}
+                    {{ usuario.descripcion }}
+                {% else %}
+                    Este cliente aún no ha añadido una descripción a su perfil.
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Actividad del cliente</h2>
+        </div>
+        <p style="font-size:0.9rem; color:#666;">
+            Este es el perfil de un cliente. Aquí, en el futuro, se podrían mostrar sus reseñas,
+            valoraciones o listas de favoritos (si decides implementarlo).
+        </p>
+    </div>
+</section>
+
+{% endblock %}

@@ -32,6 +32,7 @@ urlpatterns = [
 
     # Cuenta del usuario
     path("account/", views.mi_cuenta, name="mi_cuenta"),
+    path("mi-perfil/", views.mi_perfil, name="mi_perfil"),
 
     # Pedidos
     path("pedidos/", views.pedidos_ver, name="pedidos"),
@@ -49,7 +50,7 @@ urlpatterns = [
     # Productos (solo vendedor)
     path("producto/nuevo/", views.producto_crear, name="producto_crear"),
     path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
-    path("producto/<int:idProducto>/editar/", views.producto_editar, name="producto_editar"),
+    path("producto/<int:producto_id>/editar/", views.producto_editar, name="producto_editar"),
 
     # Favoritos
     path("favoritos/", views.favoritos, name="favoritos"),

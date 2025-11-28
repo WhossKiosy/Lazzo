@@ -151,6 +151,40 @@ def mi_cuenta(request):
         },
     )
 
+def mi_perfil(request):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    usuario = get_object_or_404(Usuario, idUsuario=usuario_id)
+
+    if usuario.rol == "vendedor":
+        productos = Producto.objects.filter(vendedor=usuario).order_by("-idProducto")
+        return render(request, "vendedor_perfil.html", {
+            "vendedor": usuario,
+            "productos": productos,
+        })
+
+    return render(request, "cliente_perfil.html", {
+        "usuario": usuario,
+    })
+    
+def vendedor_perfil(request, vendedor_id):
+    vendedor = get_object_or_404(Usuario, idUsuario=vendedor_id)
+    productos = Producto.objects.filter(vendedor=vendedor).order_by("-idProducto")
+
+    es_propietario = request.session.get("usuario_id") == vendedor_id
+
+    return render(
+        request,
+        "vendedor_perfil.html",
+        {
+            "vendedor": vendedor,
+            "productos": productos,
+            "es_propietario": es_propietario,
+        },
+    )
+
 
 def editar_perfil(request):
     usuario_id = request.session.get("usuario_id")
@@ -369,37 +403,37 @@ def productos_por_categoria(request, tipo, categoria_slug):
     return render(request, "categoria_list.html", contexto)
 
 
-def producto_editar(request, idProducto):
+def producto_editar(request, producto_id):
+    """
+    Solo el vendedor dueño del producto puede editarlo.
+    """
     usuario_id = request.session.get("usuario_id")
     if not usuario_id:
-        messages.error(request, "Debes iniciar sesión.")
         return redirect("login")
 
-    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    producto = get_object_or_404(Producto, idProducto=producto_id)
 
-    try:
-        producto = Producto.objects.get(idProducto=idProducto)
-    except Producto.DoesNotExist:
-        messages.error(request, "El producto no existe.")
-        return redirect("vendedor_perfil", vendedor_id=usuario.idUsuario)
-
-    if producto.vendedor != usuario:
-        messages.error(request, "No tienes permiso para editar este producto.")
-        return redirect("vendedor_perfil", vendedor_id=producto.vendedor.idUsuario)
+    # Verificamos que el producto pertenezca al usuario logueado
+    if producto.vendedor_id != usuario_id:
+        return HttpResponse("No tienes permiso para editar este producto.", status=403)
 
     if request.method == "POST":
         form = ProductoForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
             form.save()
             messages.success(request, "Producto actualizado correctamente.")
-            return redirect("vendedor_perfil", vendedor_id=usuario.idUsuario)
+            return redirect("vendedor_perfil", vendedor_id=usuario_id)
     else:
         form = ProductoForm(instance=producto)
 
-    return render(request, "vendedor_editarPro.html", {
-        "form": form,
-        "producto": producto
-    })
+    return render(
+        request,
+        "producto_edit_form.html",
+        {
+            "form": form,
+            "producto": producto,
+        },
+    )
 
 
 #-----------CARRITO---------------- 

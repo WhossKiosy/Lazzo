@@ -16,12 +16,16 @@ class LoginForm(forms.Form):
     contrasena = forms.CharField(widget=forms.PasswordInput)
 
 class ProductoForm(forms.ModelForm):
-    tipo = forms.ChoiceField(choices=TIPOS_PRODUCTO, label="Tipo")
+    class Meta:
+        model = Producto
+        fields = ["nombre", "descripcion", "precio", "stock", "tipo", "categoria", "imagen"]
 
-    categoria = forms.ChoiceField(
-        choices=CATEGORIAS_PRODUCTO,  # default
-        label="Categoría"
-    )
+        widgets = {
+            "imagen": ClearableFileInputES(attrs={
+                "class": "file-input-custom",
+                "id": "id_imagen"
+            })
+        }
 
     class Meta:
         model = Producto

@@ -183,7 +183,6 @@
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                // Actualizamos todos los círculos (vista previa + editar)
                 previewImgs.forEach(function (img) {
                     img.src = e.target.result;
                     img.style.display = 'block';

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar {{ producto.nombre }} - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Editar producto</h2>
+        </div>
+
+        <div class="account-card" style="max-width: 600px;">
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <!-- NOMBRE -->
+                <p>
+                    <label for="{{ form.nombre.id_for_label }}">Nombre</label><br>
+                    {{ form.nombre }}
+                    {{ form.nombre.errors }}
+                </p>
+
+                <!-- DESCRIPCIÓN -->
+                <p>
+                    <label for="{{ form.descripcion.id_for_label }}">Descripción</label><br>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </p>
+
+                <!-- PRECIO -->
+                <p>
+                    <label for="{{ form.precio.id_for_label }}">Precio</label><br>
+                    {{ form.precio }}
+                    {{ form.precio.errors }}
+                </p>
+
+                <!-- STOCK -->
+                <p>
+                    <label for="{{ form.stock.id_for_label }}">Stock</label><br>
+                    {{ form.stock }}
+                    {{ form.stock.errors }}
+                </p>
+
+                <!-- TIPO -->
+                <p>
+                    <label for="{{ form.tipo.id_for_label }}">Tipo</label><br>
+                    {{ form.tipo }}
+                    {{ form.tipo.errors }}
+                </p>
+
+                <!-- CATEGORÍA -->
+                <p>
+                    <label for="id_categoria">Categoría</label><br>
+                    <select name="categoria" id="id_categoria"
+                            style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                    </select>
+                    {{ form.categoria.errors }}
+                </p>
+
+                <!-- IMAGEN -->
+                <p>
+                    <label>Imagen del producto</label><br>
+
+                    <!-- Bloque de edición de imagen (preview cuadrado + botones) -->
+                    <div class="product-image-edit">
+
+                        <!-- PREVIEW CUADRADO -->
+                        <div class="product-image-preview-square" id="product-image-preview">
+                            {% if producto.imagen %}
+                                <img id="product-current-image"
+                                     src="{{ producto.imagen.url }}"
+                                     alt="{{ producto.nombre }}"
+                                     class="js-product-preview-img">
+                            {% else %}
+                                <img id="product-current-image"
+                                     src=""
+                                     alt="{{ producto.nombre }}"
+                                     class="js-product-preview-img"
+                                     style="display:none;">
+                                <span class="product-image-placeholder js-product-placeholder">
+                                    Aún no has seleccionado una imagen.
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- BOTONES (Cambiar / Eliminar) -->
+                        <div class="product-image-actions">
+                            <!-- Botón que dispara el input file -->
+                            <button type="button"
+                                    class="btn-secondary"
+                                    id="btn-change-image">
+                                Cambiar imagen
+                            </button>
+
+                            <!-- Botón que marca el checkbox de limpiar -->
+                            <button type="button"
+                                    class="btn-secondary"
+                                    style="background-color:#ffe5e5; color:#c62828; border-color:#ffcdd2;"
+                                    id="btn-delete-image">
+                                Eliminar imagen
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Widget original de Django (file + checkbox) oculto -->
+                    <div class="image-widget-wrapper" style="display:none;">
+                        {{ form.imagen }}
+                        {{ form.imagen.errors }}
+                    </div>
+
+                    <small style="font-size: 0.8rem; color:#777;">
+                        Formatos permitidos: JPG, JPEG, PNG, GIF.
+                    </small>
+                </p>
+
+                <br>
+
+                <!-- BOTONES GENERALES -->
+                <button type="submit" class="btn-primary">Guardar cambios</button>
+                <a href="{% url 'mi_perfil' %}" class="btn-secondary" style="margin-left: 8px;">
+                    Volver a mi perfil
+                </a>
+            </form>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ block.super }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ============================================================
+        // === CATEGORÍAS POR TIPO (PRODUCTO / SERVICIO) =============
+        // ============================================================
+        const categorias_producto = {
+            "ropa": "Ropa",
+            "accesorios": "Accesorios",
+            "tecnologia": "Tecnología",
+            "hogar": "Hogar",
+            "bebidas": "Bebidas",
+            "alimentos": "Alimentos",
+            "libros": "Libros",
+            "gaming": "Gaming",
+            "cuidado_personal": "Cuidado Personal",
+            "decoracion": "Decoración",
+        };
+
+        const categorias_servicio = {
+            "mantenimiento": "Mantenimiento",
+            "reparacion": "Reparación",
+            "consultoria": "Consultoría",
+            "asesoria": "Asesoría",
+            "instalacion": "Instalación",
+            "clases": "Clases / Tutorías",
+            "transporte": "Transporte",
+            "eventos": "Eventos",
+            "marketing": "Marketing",
+        };
+
+        const tipoSelect = document.getElementById('id_tipo');
+        const categoriaSelect = document.getElementById('id_categoria');
+
+        function cargarCategorias() {
+            if (!tipoSelect || !categoriaSelect) return;
+
+            const tipo = tipoSelect.value;
+            const data = tipo === 'servicio' ? categorias_servicio : categorias_producto;
+
+            categoriaSelect.innerHTML = '';
+
+            Object.entries(data).forEach(([value, label]) => {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = label;
+                categoriaSelect.appendChild(opt);
+            });
+
+            const categoriaActual = "{{ producto.categoria|default:'' }}";
+            if (categoriaActual) {
+                categoriaSelect.value = categoriaActual;
+            }
+        }
+
+        cargarCategorias();
+        if (tipoSelect) {
+            tipoSelect.addEventListener('change', cargarCategorias);
+        }
+
+        // ============================================================
+        // === VISTA PREVIA + BOTONES (Cambiar / Eliminar imagen) =====
+        // ============================================================
+        const fileInput     = document.getElementById('id_imagen');
+        const clearCheckbox = document.getElementById('id_imagen-clear_id');
+        const previewBox    = document.getElementById('product-image-preview');
+        const img           = document.getElementById('product-current-image');
+        const placeholder   = previewBox
+                              ? previewBox.querySelector('.js-product-placeholder')
+                              : null;
+
+        const changeBtn = document.getElementById('btn-change-image');
+        const deleteBtn = document.getElementById('btn-delete-image');
+
+        // Abrir selector de archivos
+        if (changeBtn && fileInput) {
+            changeBtn.addEventListener('click', function () {
+                fileInput.click();
+            });
+        }
+
+        // Vista previa cuando se elige un archivo nuevo
+        if (fileInput && img) {
+            fileInput.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (clearCheckbox) clearCheckbox.checked = false;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (deleteBtn && clearCheckbox && img) {
+            deleteBtn.addEventListener('click', function () {
+                const confirmDelete = confirm(
+                    '¿Estás seguro de que quieres eliminar la imagen de este producto?'
+                );
+                if (!confirmDelete) return;
+
+                clearCheckbox.checked = true;
+                fileInput.value = '';
+                img.src = '';
+                img.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'block';
+            });
+        }
+
+        // Ajustes visuales del widget oculto
+        const widgetWrapper = document.querySelector('.image-widget-wrapper');
+        if (widgetWrapper) {
+            widgetWrapper.style.display = 'none';
+        }
+    });
+    </script>
+{% endblock %}
