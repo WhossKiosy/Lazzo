@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ categoria_nombre }} - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>
+                {% if tipo == 'producto' %}
+                    Productos en {{ categoria_nombre }}
+                {% else %}
+                    Servicios de {{ categoria_nombre }}
+                {% endif %}
+            </h2>
+            <a href="{% url 'home' %}" class="see-all">Volver al inicio</a>
+        </div>
+
+        {% if productos %}
+            <div class="products-grid">
+                {% for producto in productos %}
+                    <article class="product-card">
+                        <div class="product-image">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                            {% endif %}
+                        </div>
+
+                        <h3 class="product-title">{{ producto.nombre }}</h3>
+                        <p class="product-brand">
+                            {{ categoria_nombre }}
+                        </p>
+
+                        <div class="product-prices">
+                            <span class="current-price">
+                                ${{ producto.precio }}
+                            </span>
+                        </div>
+
+                        <div class="product-actions">
+                            <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
+                                Ver detalles
+                            </a>
+                            <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
+                                Agregar al carro
+                            </a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No hay ítems disponibles en esta categoría por ahora.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

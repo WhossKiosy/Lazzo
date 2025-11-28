@@ -41,10 +41,18 @@
                 </p>
 
                 <p>
+                    <label for="{{ form.tipo.id_for_label }}">Tipo</label><br>
+                    {{ form.tipo }}
+                    {{ form.tipo.errors }}
+                </p>
+
+                <p>
                     <label for="{{ form.categoria.id_for_label }}">Categoría</label><br>
-                    {{ form.categoria }}
+                    <select name="categoria" id="id_categoria" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                    </select>
                     {{ form.categoria.errors }}
                 </p>
+
 
                 <p>
                     <label for="{{ form.imagen.id_for_label }}">Imagen del producto</label><br>
@@ -79,6 +87,58 @@
 {% block extra_scripts %}
     {{ block.super }}
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+        // === CATEGORÍAS SEGÚN TIPO ===
+        const categorias_producto = {
+            "ropa": "Ropa",
+            "accesorios": "Accesorios",
+            "tecnologia": "Tecnología",
+            "hogar": "Hogar",
+            "bebidas": "Bebidas",
+            "alimentos": "Alimentos",
+            "libros": "Libros",
+            "gaming": "Gaming",
+            "cuidado_personal": "Cuidado Personal",
+            "decoracion": "Decoración",
+        };
+
+        const categorias_servicio = {
+            "mantenimiento": "Mantenimiento",
+            "reparacion": "Reparación",
+            "consultoria": "Consultoría",
+            "asesoria": "Asesoría",
+            "instalacion": "Instalación",
+            "clases": "Clases / Tutorías",
+            "transporte": "Transporte",
+            "eventos": "Eventos",
+            "marketing": "Marketing",
+        };
+
+        const tipoSelect = document.getElementById("id_tipo");
+        const categoriaSelect = document.getElementById("id_categoria");
+
+        function cargarCategorias() {
+            const tipo = tipoSelect.value;
+            let data = tipo === 'producto' ? categorias_producto : categorias_servicio;
+
+            categoriaSelect.innerHTML = ""; // limpiar opciones
+
+            Object.entries(data).forEach(([value, label]) => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.textContent = label;
+                categoriaSelect.appendChild(option);
+            });
+        }
+
+        // Cargar categorías al cargar la página
+        cargarCategorias();
+
+        // Cambiar categorías al cambiar "tipo"
+        tipoSelect.addEventListener("change", cargarCategorias);
+    });
+    
     document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('id_imagen');
         const previewBox = document.getElementById('product-image-preview');
@@ -109,5 +169,6 @@
             reader.readAsDataURL(file);
         });
     });
+    
     </script>
 {% endblock %}

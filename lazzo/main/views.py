@@ -1,15 +1,49 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import logout as django_logout
-from .models import Usuario, Producto, ObjetoCarrito, Carrito, Pedido, Pago, Mensaje, Notificacion, Direccion, DetallePedido
+from .models import (
+    Usuario, Producto, ObjetoCarrito, Carrito, Pedido, 
+    Pago, Mensaje, Notificacion, Direccion, DetallePedido, 
+    Servicio, TIPOS_PRODUCTO, CATEGORIAS_PRODUCTO, CATEGORIAS_SERVICIO)
 from django.contrib import messages
+from django.db.models import Q
+import random
 
-
-from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm, PerfilForm
+from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm, PerfilForm, ServicioForm
 
 # Create your views here.
  
 #------------Usuarios---------------
+
+def home(request):
+    productos = Producto.objects.all().order_by('-idProducto')
+
+    categorias_prod_objs = [
+        {"tipo": "producto", "slug": value, "label": label}
+        for (value, label) in CATEGORIAS_PRODUCTO
+    ]
+    categorias_serv_objs = [
+        {"tipo": "servicio", "slug": value, "label": label}
+        for (value, label) in CATEGORIAS_SERVICIO
+    ]
+
+    todas_categorias = categorias_prod_objs + categorias_serv_objs
+    cantidad = min(4, len(todas_categorias))
+
+    categorias_destacadas = (
+        random.sample(todas_categorias, k=cantidad) if cantidad > 0 else []
+    )
+
+    return render(
+        request,
+        "home.html",
+        {
+            "productos": productos,
+            "categorias_destacadas": categorias_destacadas,
+        },
+    )
+
+
 
 def registro(request):
     error_message = None
@@ -147,21 +181,36 @@ def vendedor_perfil(request, vendedor_id):
         "productos": productos,
     })
 
+#-----------CATEGORIAS----------------
+def categoria_filtrar(request, categoria):
+    productos = Producto.objects.filter(categoria=categoria)
+
+    return render(
+        request,
+        "categoria_resultados.html",
+        {
+            "categoria": categoria,
+            "productos": productos
+        }
+    )
+
+def categoria_listado(request, tipo, categoria_slug):
+    productos = Producto.objects.filter(tipo=tipo, categoria=categoria_slug)
+
+    # diccionario {value: label} para mostrar nombre bonito
+    mapa_categorias = dict(CATEGORIAS_PRODUCTO + CATEGORIAS_SERVICIO)
+    categoria_nombre = mapa_categorias.get(categoria_slug, categoria_slug)
+
+    context = {
+        "productos": productos,
+        "tipo": tipo,
+        "categoria_slug": categoria_slug,
+        "categoria_nombre": categoria_nombre,
+    }
+    return render(request, "categoria_listado.html", context)
+
 
 #-----------SERVICIOS----------------
-
-def home(request):
-    query = request.GET.get("q", "").strip()  # texto buscado
-
-    if query:
-        servicios = Servicio.objects.filter(nombre__icontains=query).order_by("-idServicio")
-    else:
-        servicios = Servicio.objects.all().order_by("-idServicio")
-
-    return render(request, "home.html", {
-        "servicios": servicios,
-        "query": query,
-    })
 
 def servicio_detalle(request, id):
     servicio = Servicio.objects.get(idServicio=id)
@@ -190,15 +239,20 @@ def servicio_crear(request):
 
 #-----------PRODUCTOS----------------
 
-def home(request):
-    query = request.GET.get("q", "").strip()  # texto buscado
+def buscar(request):
+    query = request.GET.get("q", "").strip()
+    resultados = []
+
     if query:
-        productos = Producto.objects.filter(nombre__icontains=query).order_by("-idProducto")
-    else:
-        productos = Producto.objects.all().order_by("-idProducto")
-    return render(request, "home.html", {
-        "productos": productos,
+        resultados = Producto.objects.filter(
+            Q(nombre__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(categoria__icontains=query)
+        ).order_by("-idProducto")
+
+    return render(request, "busqueda.html", {
         "query": query,
+        "resultados": resultados,
     })
 
 def producto_detalle(request, id):
@@ -228,6 +282,28 @@ def producto_crear(request):
 def producto_detalle(request, id):
     producto = Producto.objects.get(idProducto=id)
     return render(request, "producto_detalle.html", {"producto": producto})
+
+def productos_por_categoria(request, tipo, categoria_slug):
+    # validar tipo
+    if tipo not in ['producto', 'servicio']:
+        return redirect('home')
+
+    # mapa slug -> label legible
+    categorias_map = dict(CATEGORIAS_PRODUCTO + CATEGORIAS_SERVICIO)
+    categoria_nombre = categorias_map.get(categoria_slug, categoria_slug)
+
+    productos = Producto.objects.filter(
+        tipo=tipo,
+        categoria=categoria_slug
+    ).order_by('-idProducto')
+
+    contexto = {
+        "tipo": tipo,
+        "categoria_slug": categoria_slug,
+        "categoria_nombre": categoria_nombre,
+        "productos": productos,
+    }
+    return render(request, "categoria_list.html", contexto)
 
 
 #-----------CARRITO---------------- 

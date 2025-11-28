@@ -7,6 +7,37 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.db.models import PROTECT
 
+TIPOS_PRODUCTO = [
+('producto', 'Producto'),
+('servicio', 'Servicio'),
+]
+
+CATEGORIAS_PRODUCTO = [
+    ('ropa', 'Ropa'),
+    ('accesorios', 'Accesorios'),
+    ('tecnologia', 'Tecnología'),
+    ('hogar', 'Hogar'),
+    ('bebidas', 'Bebidas'),
+    ('alimentos', 'Alimentos'),
+    ('libros', 'Libros'),
+    ('gaming', 'Gaming'),
+    ('cuidado_personal', 'Cuidado Personal'),
+    ('decoracion', 'Decoración'),
+]
+
+CATEGORIAS_SERVICIO = [
+    ('mantenimiento', 'Mantenimiento'),
+    ('reparacion', 'Reparación'),
+    ('consultoria', 'Consultoría'),
+    ('asesoria', 'Asesoría'),
+    ('instalacion', 'Instalación'),
+    ('clases', 'Clases / Tutorías'),
+    ('transporte', 'Transporte'),
+    ('eventos', 'Eventos'),
+    ('marketing', 'Marketing'),
+]
+
+
 def user_profile_upload_path(instance, filename):
     base, ext = os.path.splitext(filename)
     nombre_slug = slugify(instance.nombre_completo) or "usuario"
@@ -70,11 +101,16 @@ class Producto(models.Model):
     precio = models.IntegerField()
     stock = models.IntegerField(default=1)
 
+
     imagen = models.ImageField(
         upload_to=product_image_upload_path,
         blank=True,
         null=True
     )
+
+    tipo = models.CharField(max_length=20, choices=TIPOS_PRODUCTO, default='producto')
+    categoria = models.CharField(max_length=50)
+
 
     categoria = models.CharField(max_length=50)
     vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="productos")
@@ -108,11 +144,10 @@ class Carrito(models.Model):
 class Direccion(models.Model):
     idDireccion = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="direcciones")
-    alias = models.CharField(max_length=100, blank=True)  # Ej: "Casa", "Trabajo"
-    direccion = models.CharField(max_length=100)          # Texto completo
+    alias = models.CharField(max_length=100, blank=True)
+    direccion = models.CharField(max_length=100)
 
     def __str__(self):
-        # Lo que se mostrará en el admin / templates
         if self.alias:
             return f"{self.alias} - {self.direccion}"
         return self.direccion

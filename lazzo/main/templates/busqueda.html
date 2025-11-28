@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resultados de búsqueda - Lazzo{% endblock %}
+
+{% block content %}
+
+<section class="products-section">
+    <div class="container">
+
+        <div class="section-header">
+            {% if query %}
+                <h2>Resultados para: "{{ query }}"</h2>
+            {% else %}
+                <h2>Buscar productos</h2>
+            {% endif %}
+            <a href="{% url 'home' %}" class="see-all">Volver al inicio</a>
+        </div>
+
+        {% if resultados %}
+            <div class="products-grid">
+                {% for producto in resultados %}
+                    <article class="product-card">
+
+                        <div class="product-image">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                            {% endif %}
+                        </div>
+
+                        <h3 class="product-title">{{ producto.nombre }}</h3>
+                        <p class="product-brand">{{ producto.categoria }}</p>
+
+                        <div class="product-prices">
+                            <span class="current-price">${{ producto.precio }}</span>
+                        </div>
+
+                        <div class="product-actions">
+                            <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
+                                Ver detalles
+                            </a>
+
+                            <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
+                                Agregar al carro
+                            </a>
+                        </div>
+
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="margin-top:16px; font-size:1rem; color:#666;">
+                No se encontraron productos relacionados con tu búsqueda.
+            </p>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

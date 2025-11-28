@@ -75,16 +75,18 @@
             </div>
 
             <div class="search-bar">
-                <form method="GET" action="{% url 'home' %}" class="search-form">
-                    <input 
-                        type="text" 
-                        name="q" 
-                        placeholder="¿Qué estás buscando?"
-                        value="{{ query|default:'' }}"
-                    >
-                    <button type="submit">Buscar</button>
-                </form>
+                <input 
+                    type="text" 
+                    name="q" 
+                    form="searchForm"
+                    placeholder="¿Qué estás buscando?"
+                    value="{{ query|default:'' }}"
+                >
+                <button type="submit" form="searchForm">Buscar</button>
+
+                <form id="searchForm" method="GET" action="{% url 'buscar' %}"></form>
             </div>
+
 
             <div class="header-icons">
                 <a href="{% url 'pedidos' %}" class="header-icon">Mis compras</a>
@@ -107,8 +109,44 @@
     <!-- Menú de categorías -->
     <nav class="main-nav">
         <div class="container nav-content">
-            <a href="#">Productos</a>
-            <a href="#">Servicios</a>
+
+            <!-- Dropdown de PRODUCTOS -->
+            <div class="nav-dropdown">
+                <button type="button" class="nav-link nav-toggle">
+                    Productos ▾
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{% url 'categoria_list' 'producto' 'ropa' %}">Ropa</a>
+                    <a href="{% url 'categoria_list' 'producto' 'accesorios' %}">Accesorios</a>
+                    <a href="{% url 'categoria_list' 'producto' 'tecnologia' %}">Tecnología</a>
+                    <a href="{% url 'categoria_list' 'producto' 'hogar' %}">Hogar</a>
+                    <a href="{% url 'categoria_list' 'producto' 'bebidas' %}">Bebidas</a>
+                    <a href="{% url 'categoria_list' 'producto' 'alimentos' %}">Alimentos</a>
+                    <a href="{% url 'categoria_list' 'producto' 'libros' %}">Libros</a>
+                    <a href="{% url 'categoria_list' 'producto' 'gaming' %}">Gaming</a>
+                    <a href="{% url 'categoria_list' 'producto' 'cuidado_personal' %}">Cuidado personal</a>
+                    <a href="{% url 'categoria_list' 'producto' 'decoracion' %}">Decoración</a>
+                </div>
+            </div>
+
+            <!-- Dropdown de SERVICIOS -->
+            <div class="nav-dropdown">
+                <button type="button" class="nav-link nav-toggle">
+                    Servicios ▾
+                </button>
+                <div class="nav-dropdown-menu">
+                    <a href="{% url 'categoria_list' 'servicio' 'mantenimiento' %}">Mantenimiento</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'reparacion' %}">Reparación</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'consultoria' %}">Consultoría</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'asesoria' %}">Asesoría</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'instalacion' %}">Instalación</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'clases' %}">Clases / Tutorías</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'transporte' %}">Transporte</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'eventos' %}">Eventos</a>
+                    <a href="{% url 'categoria_list' 'servicio' 'marketing' %}">Marketing</a>
+                </div>
+            </div>
+
         </div>
     </nav>
 
@@ -157,17 +195,17 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // ===== Menú de usuario en top bar =====
-        const menu = document.querySelector('.user-menu');
-        if (menu) {
-            const toggle = menu.querySelector('.user-menu-toggle');
+        const userMenu = document.querySelector('.user-menu');
+        if (userMenu) {
+            const userToggle = userMenu.querySelector('.user-menu-toggle');
 
-            toggle.addEventListener('click', function (e) {
+            userToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
-                menu.classList.toggle('open');
+                userMenu.classList.toggle('open');
             });
 
             document.addEventListener('click', function () {
-                menu.classList.remove('open');
+                userMenu.classList.remove('open');
             });
         }
 
@@ -191,6 +229,35 @@
                     alert.parentNode.removeChild(alert);
                 }
             }, 4600 + index * 200);
+        });
+
+        // ===== Menús desplegables de navegación (Productos / Servicios) =====
+        const navDropdowns = document.querySelectorAll('.nav-dropdown');
+
+        navDropdowns.forEach(function (dropdown) {
+            const toggle = dropdown.querySelector('.nav-toggle');
+            const menu = dropdown.querySelector('.nav-dropdown-menu');
+
+            if (!toggle || !menu) return;
+
+            // Abrir/cerrar al hacer click
+            toggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+
+                // Cerrar otros menús
+                navDropdowns.forEach(function (d) {
+                    if (d !== dropdown) d.classList.remove('open');
+                });
+
+                dropdown.classList.toggle('open');
+            });
+        });
+
+        // Cerrar todos al hacer click fuera
+        document.addEventListener('click', function () {
+            navDropdowns.forEach(function (d) {
+                d.classList.remove('open');
+            });
         });
     });
     </script>

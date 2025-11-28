@@ -10,12 +10,18 @@ urlpatterns = [
 
     # Home
     path('', views.home, name="home"),
+    path("buscar/", views.buscar, name="buscar"),
+    path("categoria/<str:tipo>/<str:categoria_slug>/", views.productos_por_categoria, name="categoria_list"),
+    path(
+            "categoria/<str:tipo>/<str:categoria_slug>/",
+            views.categoria_listado,
+            name="categoria_listado",
+        ),
 
     # Autenticación
     path('login/', views.login, name="login"),
     path('signup/', views.registro, name="registro"),
     path('registro/', views.registro, name="signup"),
-
     path('logout/', views.logout, name="logout"),
 
     # Carrito

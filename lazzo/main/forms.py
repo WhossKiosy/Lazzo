@@ -1,5 +1,6 @@
 from django import forms
-from .models import Usuario, Producto, Mensaje
+from .models import Usuario, Producto, Mensaje, Servicio
+from .models import Producto, TIPOS_PRODUCTO, CATEGORIAS_PRODUCTO, CATEGORIAS_SERVICIO
 from .widgets import ClearableFileInputES
 
 class RegistroForm(forms.ModelForm):
@@ -14,11 +15,17 @@ class LoginForm(forms.Form):
     correo = forms.EmailField()
     contrasena = forms.CharField(widget=forms.PasswordInput)
 
-
 class ProductoForm(forms.ModelForm):
+    tipo = forms.ChoiceField(choices=TIPOS_PRODUCTO, label="Tipo")
+
+    categoria = forms.ChoiceField(
+        choices=CATEGORIAS_PRODUCTO,  # default
+        label="Categoría"
+    )
+
     class Meta:
         model = Producto
-        fields = ["nombre", "descripcion", "precio", "stock", "imagen", "categoria"]
+        fields = ["nombre", "descripcion", "precio", "stock", "tipo", "categoria", "imagen"]
 
 
 class ServicioForm(forms.ModelForm):
