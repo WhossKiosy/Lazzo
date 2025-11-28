@@ -1,0 +1,344 @@
+/* --------------------------------------------------
+   HERO (banner principal)
+-------------------------------------------------- */
+
+.hero {
+    background: linear-gradient(120deg, #ffb503, #ffcb52);
+    color: #fff;
+    padding: 32px 0;
+    margin-bottom: 24px;
+}
+
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.hero-text h1 {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+
+.hero-text p {
+    font-size: 1rem;
+    margin-bottom: 16px;
+    max-width: 420px;
+}
+
+/* En el hero el botón primario es blanco */
+.hero .btn-primary {
+    background-color: #ffffff;
+    color: black;
+    border-color: transparent;
+}
+
+.hero .btn-primary:hover {
+    background-color: #f4f4f4;
+}
+
+.hero-image {
+    flex: 1;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Responsive hero */
+@media (max-width: 900px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-text p {
+        margin: 0 auto 16px;
+    }
+}
+
+/* --------------------------------------------------
+   TIRA DE PROMOS
+-------------------------------------------------- */
+
+.promo-strip {
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 18px 0;
+    margin-bottom: 24px;
+}
+
+.promo-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: space-between;
+}
+
+.promo-item {
+    flex: 1;
+    min-width: 200px;
+}
+
+.promo-item h3 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.promo-item p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* --------------------------------------------------
+   SECCIÓN DE PRODUCTOS
+-------------------------------------------------- */
+
+.products-section {
+    margin-bottom: 32px;
+}
+
+.section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+}
+
+.see-all {
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #ff9500;
+}
+
+.see-all:hover {
+    text-decoration: underline;
+}
+
+/* Grid de productos */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+/* Si solo hay 1 producto, lo centramos y limitamos tamaño */
+.products-grid-single {
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+/* Tarjeta de producto */
+.product-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid #e4e4e4;
+}
+
+/* Imagen en la tarjeta */
+.product-image {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    height: 260px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 0 auto 8px auto;
+}
+
+.product-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.product-title {
+    font-size: 0.95rem;
+}
+
+.product-brand {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.product-prices {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.current-price {
+    font-weight: 700;
+    color: #d9004c;
+}
+
+.old-price {
+    font-size: 0.8rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
+/* Botones dentro de la tarjeta */
+.product-card .product-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.product-card .product-actions .btn-primary,
+.product-card .product-actions .btn-secondary {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 0.85rem;
+}
+
+/* --------------------------------------------------
+   CATEGORÍAS DESTACADAS
+-------------------------------------------------- */
+
+.categories-section {
+    margin-bottom: 32px;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.category-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 32px 16px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    border: 1px solid #e4e4e4;
+}
+
+.category-card:hover {
+    border-color: #ffb503;
+    color: #ffb503;
+}
+
+/* Responsive categorías */
+@media (max-width: 900px) {
+    .products-grid,
+    .categories-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .products-grid,
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --------------------------------------------------
+   DETALLE DE PRODUCTO
+-------------------------------------------------- */
+
+.product-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.5fr);
+    gap: 24px;
+    align-items: flex-start;
+    margin-top: 16px;
+}
+
+.product-detail-image {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.product-detail-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+}
+
+.product-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-detail-title {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+}
+
+.product-detail-category {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.product-detail-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.product-detail-stock {
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.product-detail-description {
+    margin-top: 6px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.product-detail-seller {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Reuso de layout de botones en detalle */
+.product-detail-actions,
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.product-detail-actions .btn-primary,
+.product-detail-actions .btn-secondary {
+    flex: 1;
+}
+
+/* Responsive detalle */
+@media (max-width: 900px) {
+    .product-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .product-detail-image {
+        max-width: 320px;
+    }
+}

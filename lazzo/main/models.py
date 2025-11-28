@@ -1,7 +1,24 @@
+import os
 from django.db import models
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
+from django.db import models
+from django.utils import timezone
+from django.utils.text import slugify
+from django.db.models import PROTECT
 
+def user_profile_upload_path(instance, filename):
+    base, ext = os.path.splitext(filename)
+    nombre_slug = slugify(instance.nombre_completo) or "usuario"
+    timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
+    return f"pfp/{nombre_slug}-{timestamp}{ext}"
+
+
+def product_image_upload_path(instance, filename):
+    base, ext = os.path.splitext(filename)
+    nombre_slug = slugify(instance.nombre) or "producto"
+    timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
+    return f"products/{nombre_slug}-{timestamp}{ext}"
 
 class Usuario(models.Model):
     roles = [
@@ -15,6 +32,13 @@ class Usuario(models.Model):
     contrasena = models.CharField(max_length=50)
     rol = models.CharField(max_length=20, choices=roles)
     fecha_registro = models.DateTimeField(default=timezone.now)
+    descripcion = models.TextField(blank=True, null=True)
+
+    foto = models.ImageField(
+        upload_to=user_profile_upload_path,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.nombre_completo
@@ -26,12 +50,13 @@ class Producto(models.Model):
     descripcion = models.TextField()
     precio = models.IntegerField()
     stock = models.IntegerField(default=1)
+
     imagen = models.ImageField(
-        upload_to='productos/',
+        upload_to=product_image_upload_path,
         blank=True,
-        null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
-        )
+        null=True
+    )
+
     categoria = models.CharField(max_length=50)
     vendedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="productos")
 
@@ -61,16 +86,49 @@ class Carrito(models.Model):
         self.save()
 
 
+class Direccion(models.Model):
+    idDireccion = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="direcciones")
+    alias = models.CharField(max_length=100, blank=True)  # Ej: "Casa", "Trabajo"
+    direccion = models.CharField(max_length=255)          # Texto completo
+
+    def __str__(self):
+        # Lo que se mostrará en el admin / templates
+        if self.alias:
+            return f"{self.alias} - {self.direccion}"
+        return self.direccion
+
+
 class Pedido(models.Model):
     idPedido = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     fecha = models.DateTimeField(default=timezone.now)
     estado = models.CharField(max_length=20)
     total = models.IntegerField()
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    envio = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Pedido {self.idPedido}"
+    
 
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name="detalles"
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.PROTECT,
+        related_name="detalles_pedido"
+    )
+    cantidad = models.IntegerField(default=1)
+    precio_unitario = models.IntegerField()
+    subtotal = models.IntegerField()
+
+    def __str__(self):
+        return f"DetallePedido {self.id} - Pedido {self.pedido_id}"
 
 class Pago(models.Model):
     estados = (

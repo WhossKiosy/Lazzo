@@ -1,0 +1,318 @@
+/* --------------------------------------------------
+   FORMULARIOS (login / registro / éxito)
+-------------------------------------------------- */
+
+.field-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+
+    background: url('/static/img/LazzoBackground.png') no-repeat center center/cover;
+    position: relative;
+}
+
+.field-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* Card de formulario */
+.field-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid #e4e4e4;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+
+    position: relative;
+    z-index: 2;
+}
+
+.field-title {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.field-subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+/* Inputs */
+.field-form p {
+    margin-bottom: 16px;
+}
+
+.field-form input,
+.field-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.field-form input:focus,
+.field-form select:focus {
+    border-color: #ffb503;
+    box-shadow: 0 0 4px rgba(255,181,3,0.4);
+}
+
+/* Botón principal de los formularios */
+.field-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+/* texto bajo el formulario */
+.field-register {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.field-register a {
+    color: #ffb503;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.field-register a:hover {
+    text-decoration: underline;
+}
+
+/* Ajuste para centrar mejor el registro respecto al botón volver */
+.register-adjust {
+    margin-top: 90px;
+}
+
+/* Botón "Volver al inicio" flotante */
+.back-home-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+
+    display: inline-block;
+    padding: 8px 14px;
+
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+
+    transition: 0.25s ease;
+    z-index: 20;
+}
+
+.back-home-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+}
+
+/* Mensaje de error */
+.form-error {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background-color: #ffebee;
+    color: #c62828;
+    font-size: 0.9rem;
+    border: 1px solid #ffcdd2;
+}
+
+/* Botón grande en pantalla de éxito */
+.success-btn {
+    display: block;
+    margin: 20px auto 0 auto;
+    padding: 10px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: none;
+    background-color: #ffb503;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.success-btn:hover {
+    background-color: #ffca4d;
+}
+
+/* ============================
+   FORMULARIO "EDITAR PERFIL"
+   (Mi cuenta)
+============================ */
+
+.profile-form .form-row {
+    margin-bottom: 12px;
+}
+
+.profile-form .form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+.profile-form input[type="text"],
+.profile-form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.profile-form input[type="text"]:focus,
+.profile-form textarea:focus {
+    border-color: #ffb503;
+    box-shadow: 0 0 4px rgba(255,181,3,0.25);
+}
+
+/* Contenedor general del bloque de foto */
+.profile-photo-edit {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Preview redonda */
+.account-card .profile-photo-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ffe6a7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #a86a00;
+}
+
+.profile-photo-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Inicial si no hay foto */
+.profile-photo-placeholder {
+    display: inline-block;
+}
+
+/* Botones a la derecha de la foto */
+.profile-photo-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Botón "Cambiar foto" */
+.btn-photo-edit,
+.btn-photo-delete {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    text-align: center;
+}
+
+/* Cambiar foto → estilo secundario amarillo */
+.btn-photo-edit {
+    background-color: #ffffff;
+    border-color: #ffb503;
+    color: #ffb503;
+    font-weight: 500;
+}
+
+.btn-photo-edit:hover {
+    background-color: #fff7e0;
+}
+
+/* Eliminar foto → estilo de advertencia */
+.btn-photo-delete {
+    background-color: #ffe5e5;
+    border-color: #ff8a80;
+    color: #c62828;
+    font-weight: 500;
+}
+
+.btn-photo-delete:hover {
+    background-color: #ffcccc;
+}
+
+/* Ocultar visualmente el input file dentro de este bloque */
+.profile-photo-edit input[type="file"] {
+    display: none;
+}
+
+/* Botón guardar */
+.profile-submit-btn {
+    margin-top: 10px;
+    padding-inline: 18px;
+}
+
+/* Responsive: apilar foto + botones en pantallas pequeñas */
+@media (max-width: 600px) {
+    .profile-photo-edit {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ============================
+   Preview de imagen (nuevo producto)
+============================ */
+
+.product-image-preview-wrapper {
+    margin: 6px 0 10px 0;
+}
+
+.product-image-preview {
+    width: 100%;
+    max-width: 260px;
+    height: 260px;
+    border-radius: 12px;
+    border: 1px dashed #ccc;
+    background-color: #f8f8f8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image-placeholder {
+    padding: 0 8px;
+    text-align: center;
+    color: #999;
+    font-size: 0.85rem;
+}

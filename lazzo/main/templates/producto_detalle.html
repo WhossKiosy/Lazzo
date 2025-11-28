@@ -37,8 +37,12 @@
             </p>
 
             <p class="product-detail-seller">
-                Vendido por: <strong>{{ producto.vendedor.nombre_completo }}</strong>
+                Vendido por:
+                <a href="{% url 'vendedor_perfil' producto.vendedor.idUsuario %}" class="seller-link">
+                    <strong>{{ producto.vendedor.nombre_completo }}</strong>
+                </a>
             </p>
+
 
             <br>
 

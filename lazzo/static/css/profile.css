@@ -1,0 +1,76 @@
+/* ======================================
+   PERFIL DEL VENDEDOR
+======================================*/
+
+.seller-header {
+    background: linear-gradient(135deg, #ffb503, #ffcb52);
+    padding: 32px 0;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.seller-banner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.seller-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    overflow: hidden;
+}
+
+.seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.seller-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.seller-name {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.seller-role {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.seller-description {
+    font-size: 0.95rem;
+    max-width: 600px;
+    opacity: 0.95;
+}
+
+.seller-link {
+    color: #ff9500;
+    text-decoration: none;
+}
+
+.seller-link:hover {
+    text-decoration: underline;
+}
+
+/* responsive */
+@media (max-width: 800px) {
+    .seller-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}

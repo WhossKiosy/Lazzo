@@ -6,35 +6,197 @@
 {% block content %}
 <section class="products-section">
     <div class="container">
-        <h2>Mi cuenta</h2>
+        <div class="section-header">
+            <h2>Mi cuenta</h2>
+        </div>
 
         <div class="account-grid">
+
+            <!-- Perfil -->
             <div class="account-card">
-                <h3>Datos personales</h3>
-                <p><strong>Nombre:</strong> {{ usuario.nombre_completo }}</p>
-                <p><strong>Correo:</strong> {{ usuario.correo }}</p>
-                <p><strong>Rol:</strong> {{ usuario.rol|title }}</p>
-                <p><strong>Registrado el:</strong> {{ usuario.fecha_registro|date:"d/m/Y H:i" }}</p>
+                <h3>Vista previa de tu perfil</h3>
+
+                <div class="seller-banner" style="margin-top:10px; gap:14px;">
+
+                    <div class="profile-photo-preview">
+                        {% if usuario.foto %}
+                            <img src="{{ usuario.foto.url }}"
+                                alt="{{ usuario.nombre_completo }}"
+                                class="js-profile-preview-img">
+                            <span class="profile-photo-placeholder js-profile-placeholder" style="display:none;">
+                                {{ usuario.nombre_completo|first }}
+                            </span>
+                        {% else %}
+                            <img src=""
+                                alt="{{ usuario.nombre_completo }}"
+                                class="js-profile-preview-img"
+                                style="display:none;">
+                            <span class="profile-photo-placeholder js-profile-placeholder">
+                                {{ usuario.nombre_completo|first }}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <strong>{{ usuario.nombre_completo }}</strong><br>
+                        <small>Rol: {{ usuario.rol|title }}</small><br>
+                        <small>Registrado el {{ usuario.fecha_registro|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+
+                <p style="margin-top:10px; font-size:0.9rem;">
+                    {% if usuario.descripcion %}
+                        {{ usuario.descripcion }}
+                    {% else %}
+                        Aún no has añadido una descripción a tu perfil.
+                    {% endif %}
+                </p>
             </div>
 
+
+            <!-- Editar perfil -->
+            <div class="account-card">
+                <h3>Editar perfil</h3>
+
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+
+                    <!-- Nombre -->
+                    <div class="form-row">
+                        <label for="{{ form.nombre_completo.id_for_label }}" class="form-label">
+                            Nombre
+                        </label>
+                        {{ form.nombre_completo }}
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-row">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                            Descripción
+                        </label>
+                        {{ form.descripcion }}
+                    </div>
+
+                    <!-- Foto de perfil -->
+                    <div class="form-row">
+                        <label class="form-label">Foto de perfil</label>
+
+                        <div class="profile-photo-edit">
+                            <!-- Preview redonda -->
+                            <div class="profile-photo-preview">
+                                {% if usuario.foto %}
+                                    <img src="{{ usuario.foto.url }}"
+                                        alt="{{ usuario.nombre_completo }}"
+                                        class="js-profile-preview-img">
+                                    <span class="profile-photo-placeholder js-profile-placeholder" style="display:none;">
+                                        {{ usuario.nombre_completo|first }}
+                                    </span>
+                                {% else %}
+                                    <img src=""
+                                        alt="{{ usuario.nombre_completo }}"
+                                        class="js-profile-preview-img"
+                                        style="display:none;">
+                                    <span class="profile-photo-placeholder js-profile-placeholder">
+                                        {{ usuario.nombre_completo|first }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="profile-photo-buttons">
+                                <button type="button"
+                                        class="btn-photo-edit"
+                                        onclick="document.getElementById('{{ form.foto.id_for_label }}').click();">
+                                    Cambiar foto
+                                </button>
+
+                                {% if usuario.foto %}
+                                    <button type="submit"
+                                            name="eliminar_foto"
+                                            value="1"
+                                            class="btn-photo-delete"
+                                            onclick="return confirm('¿Estás seguro que quieres eliminar tu foto de perfil?');">
+                                        Eliminar foto
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                            <!-- Input file real (oculto visualmente) -->
+                            {{ form.foto }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary profile-submit-btn">
+                        Guardar cambios
+                    </button>
+                </form>
+            </div>
+
+            <!-- Pedidos recientes -->
             <div class="account-card">
                 <h3>Pedidos recientes</h3>
+
                 {% if pedidos_recientes %}
-                    <ul class="account-orders">
-                        {% for pedido in pedidos_recientes %}
-                            <li>
-                                Pedido #{{ pedido.idPedido }} 
-                                {{ pedido.fecha|date:"d/m/Y" }} 
-                                ${{ pedido.total }} 
-                                Estado: {{ pedido.estado }}
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <table class="table-basic" style="margin-top:8px;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pedido in pedidos_recientes %}
+                                <tr>
+                                    <td>#{{ pedido.idPedido }}</td>
+                                    <td>{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ pedido.estado|title }}</td>
+                                    <td>${{ pedido.total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 {% else %}
-                    <p>No tienes pedidos aún.</p>
+                    <p>No tienes pedidos recientes.</p>
                 {% endif %}
             </div>
+
         </div>
     </div>
 </section>
+{% endblock %}
+{% block extra_scripts %}
+    {{ block.super }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // input file generado por Django: id="id_foto"
+        const fileInput = document.getElementById('id_foto');
+        if (!fileInput) return;
+
+        const previewImgs = document.querySelectorAll('.js-profile-preview-img');
+        const placeholders = document.querySelectorAll('.js-profile-placeholder');
+
+        fileInput.addEventListener('change', function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                // Actualizamos todos los círculos (vista previa + editar)
+                previewImgs.forEach(function (img) {
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                });
+
+                // Ocultamos las iniciales
+                placeholders.forEach(function (ph) {
+                    ph.style.display = 'none';
+                });
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+    </script>
 {% endblock %}

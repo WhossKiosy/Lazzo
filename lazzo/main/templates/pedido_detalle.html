@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Pedido #{{ pedido.idPedido }} - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <div class="container">
+
+        <div class="section-header">
+            <h2>Detalle del pedido #{{ pedido.idPedido }}</h2>
+            <a href="{% url 'pedidos' %}" class="see-all">Volver a mis pedidos</a>
+        </div>
+
+        <div class="account-card">
+
+            <div class="order-detail-header">
+                <p><strong>Fecha:</strong> {{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+
+                <p><strong>Estado:</strong>
+                    {% if pedido.estado|lower == "pagado" %}
+                        <span class="badge-status badge-success">Pagado</span>
+                    {% elif pedido.estado|lower == "pendiente" %}
+                        <span class="badge-status badge-warning">Pendiente</span>
+                    {% else %}
+                        <span class="badge-status badge-neutral">{{ pedido.estado|capfirst }}</span>
+                    {% endif %}
+                </p>
+
+                {% if pedido.direccion %}
+                    <p><strong>Dirección de envío:</strong> {{ pedido.direccion }}</p>
+                {% endif %}
+
+                {% if pago %}
+                    <p><strong>Método de pago:</strong> {{ pago.metodo }}</p>
+                    <p><strong>Estado del pago:</strong> {{ pago.estado|capfirst }}</p>
+                {% endif %}
+            </div>
+
+            <hr style="margin: 16px 0;">
+
+            <h3>Productos del pedido</h3>
+
+            {% if items %}
+                <table class="table-basic" style="margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio unitario</th>
+                            <th class="orders-col-total">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        {% if item.producto.imagen %}
+                                            <img src="{{ item.producto.imagen.url }}"
+                                                 alt="{{ item.producto.nombre }}"
+                                                 style="width:42px; height:42px; object-fit:cover; border-radius:8px;">
+                                        {% endif %}
+                                        <span>{{ item.producto.nombre }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ item.cantidad }}</td>
+                                <td>${{ item.precio_unitario }}</td>
+                                <td class="orders-col-total">
+                                    ${{ item.subtotal }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="margin-top:10px;">No se encontraron productos asociados a este pedido.</p>
+            {% endif %}
+
+            <hr style="margin: 16px 0;">
+
+            <h3>Resumen de la compra</h3>
+            <table class="table-basic" style="margin-top: 10px;">
+                <tbody>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="orders-col-total">${{ subtotal }}</td>
+                    </tr>
+                    {% if pedido.envio %}
+                        <tr>
+                            <td>Envío</td>
+                            <td class="orders-col-total">${{ pedido.envio }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td><strong>Total pagado</strong></td>
+                        <td class="orders-col-total"><strong>${{ pedido.total }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

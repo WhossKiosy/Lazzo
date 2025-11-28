@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmar compra - Lazzo{% endblock %}
+
+{% block content %}
+<section class="products-section cart-section">
+    <div class="container">
+
+        <div class="section-header">
+            <h2>Confirmar compra</h2>
+            <a href="{% url 'cart' %}" class="see-all">Volver al carrito</a>
+        </div>
+
+        <div class="cart-layout">
+
+            <!-- Columna izquierda: direcciones + resumen de ítems -->
+            <div class="cart-items">
+
+                <div class="account-card">
+                    <h3 style="margin-bottom: 10px;">Dirección de envío</h3>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if direcciones %}
+                            <p>
+                                <label for="direccion_id">Selecciona una dirección guardada</label><br>
+                                <select name="direccion_id" id="direccion_id" style="margin-top:4px; padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
+                                    {% for d in direcciones %}
+                                        <option value="{{ d.idDireccion }}">{{ d }}</option>
+                                    {% endfor %}
+                                    <option value="nueva"> Agregar nueva dirección</option>
+                                </select>
+                            </p>
+                        {% else %}
+                            <p style="font-size:0.9rem; color:#777;">
+                                Aún no tienes direcciones guardadas. Agrega una para continuar.
+                            </p>
+                            <input type="hidden" name="direccion_id" value="nueva">
+                        {% endif %}
+
+                        <div id="nueva-direccion-fields" {% if direcciones %}style="display:none;"{% endif %}>
+                            <p style="margin-top:8px;">
+                                <label for="alias_nueva">Alias (opcional)</label><br>
+                                <input type="text" name="alias_nueva" id="alias_nueva" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+                            </p>
+                            <p>
+                                <label for="direccion_nueva">Nueva dirección</label><br>
+                                <textarea name="direccion_nueva" id="direccion_nueva" rows="3"
+                                          style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;"></textarea>
+                            </p>
+                        </div>
+
+                        <hr style="margin:14px 0;">
+
+                        <h4 style="margin-bottom:8px;">Resumen de productos</h4>
+                        {% for obj in objetos %}
+                            <div class="cart-summary-row">
+                                <div>
+                                    <span class="cart-summary-product">{{ obj.producto.nombre }}</span><br>
+                                    <small>x{{ obj.cantidad }}</small>
+                                </div>
+                                <span>${{ obj.subtotal }}</span>
+                            </div>
+                        {% endfor %}
+
+                        <hr style="margin:10px 0;">
+
+                        <div class="cart-summary-row">
+                            <span>Subtotal</span>
+                            <span>${{ carrito.total }}</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Envío</span>
+                            <span>${{ shipping_cost }}</span>
+                        </div>
+                        <div class="cart-summary-row cart-summary-total">
+                            <span>Total a pagar</span>
+                            <span>${{ total_con_envio }}</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary cart-checkout-btn" style="margin-top:16px;">
+                            Confirmar y pagar
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Columna derecha: resumen compacto -->
+            <aside class="cart-summary">
+                <h3>Detalle de la compra</h3>
+
+                {% for obj in objetos %}
+                    <div class="cart-summary-row">
+                        <div>
+                            <span class="cart-summary-product">{{ obj.producto.nombre }}</span><br>
+                            <small>x{{ obj.cantidad }}</small>
+                        </div>
+                        <span>${{ obj.subtotal }}</span>
+                    </div>
+                {% endfor %}
+
+                <hr>
+
+                <div class="cart-summary-row">
+                    <span>Subtotal</span>
+                    <span>${{ carrito.total }}</span>
+                </div>
+
+                <div class="cart-summary-row">
+                    <span>Envío</span>
+                    <span>${{ shipping_cost }}</span>
+                </div>
+
+                <div class="cart-summary-row cart-summary-total">
+                    <span>Total a pagar</span>
+                    <span>${{ total_con_envio }}</span>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+    {{ block.super }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('direccion_id');
+        const newFields = document.getElementById('nueva-direccion-fields');
+
+        if (select && newFields) {
+            const toggleFields = () => {
+                if (select.value === 'nueva') {
+                    newFields.style.display = 'block';
+                } else {
+                    newFields.style.display = 'none';
+                }
+            };
+            select.addEventListener('change', toggleFields);
+            toggleFields();
+        }
+    });
+    </script>
+{% endblock %}

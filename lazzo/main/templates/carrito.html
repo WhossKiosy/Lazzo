@@ -107,15 +107,11 @@
                         <span>${{ total_con_envio }}</span>
                     </div>
 
-                    <form method="post" action="{% url 'crear_pedido' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-primary cart-checkout-btn">
-                            Continuar con la compra
-                        </button>
-                    </form>
-                </aside>
-
+                    <a href="{% url 'checkout' %}" class="btn-primary cart-checkout-btn">
+                        Continuar con la compra
+                    </a>
             </div>
+
         {% else %}
             <p>Tu carrito está vacío.</p>
             <br>

@@ -40,7 +40,7 @@
                         </div>
 
                         <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Mi cuenta</a>
-                        <a href="{% url 'pedidos' %}" class="user-menu-link">Mis pedidos</a>
+                        <a href="{% url 'pedidos' %}" class="user-menu-link">Mis compras</a>
                         <a href="{% url 'mensajes' %}" class="user-menu-link">Mensajes</a>
                         <a href="{% url 'notificaciones' %}" class="user-menu-link">Notificaciones</a>
 
@@ -80,12 +80,22 @@
             </div>
 
             <div class="header-icons">
-                <a href="#" class="header-icon">Mis compras</a>
+                <a href="{% url 'pedidos' %}" class="header-icon">Mis compras</a>
                 <a href="#" class="header-icon">Favoritos</a>
                 <a href="{% url 'cart' %}" class="header-icon cart-icon">Carro (0)</a>
             </div>
         </div>
     </header>
+
+    {% if messages %}
+    <div class="messages-wrapper">
+        {% for message in messages %}
+            <div class="alert-message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Menú de categorías -->
     <nav class="main-nav">
@@ -139,18 +149,41 @@
     {% block extra_scripts %}
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // ===== Menú de usuario en top bar =====
         const menu = document.querySelector('.user-menu');
-        if (!menu) return;
+        if (menu) {
+            const toggle = menu.querySelector('.user-menu-toggle');
 
-        const toggle = menu.querySelector('.user-menu-toggle');
+            toggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('open');
+            });
 
-        toggle.addEventListener('click', function (e) {
-            e.stopPropagation();
-            menu.classList.toggle('open');
-        });
+            document.addEventListener('click', function () {
+                menu.classList.remove('open');
+            });
+        }
 
-        document.addEventListener('click', function () {
-            menu.classList.remove('open');
+        // ===== Mensajes flash (Django messages) =====
+        const alerts = document.querySelectorAll('.alert-message');
+
+        alerts.forEach(function (alert, index) {
+            // Pequeño delay para el efecto "slide in"
+            setTimeout(function () {
+                alert.classList.add('show');
+            }, 40 + index * 80);
+
+            // Autodesaparecer después de 4 segundos
+            setTimeout(function () {
+                alert.classList.add('hide');
+            }, 4000 + index * 200);
+
+            // Eliminar del DOM después de la transición
+            setTimeout(function () {
+                if (alert && alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 4600 + index * 200);
         });
     });
     </script>

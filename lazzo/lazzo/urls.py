@@ -28,7 +28,8 @@ urlpatterns = [
     # Pedidos
     path("pedidos/", views.pedidos_ver, name="pedidos"),
     path("pedido/crear/", views.crear_pedido, name="crear_pedido"),
-    path("pedido/pagar/<int:pedido_id>/", views.pagar, name="pagar"),
+    path("checkout/", views.checkout, name="checkout"),
+    path("pedido/<int:pedido_id>/", views.pedido_detalle, name="pedido_detalle"),
 
     # Mensajes
     path("mensajes/", views.mensajes_ver, name="mensajes"),
@@ -40,6 +41,9 @@ urlpatterns = [
     # Productos (solo vendedor)
     path("producto/nuevo/", views.producto_crear, name="producto_crear"),
     path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
+
+    # Perfil tienda/vendedor
+    path("vendedor/<int:vendedor_id>/", views.vendedor_perfil, name="vendedor_perfil"),
 ]
 
 if settings.DEBUG:

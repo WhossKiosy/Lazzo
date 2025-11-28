@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import logout as django_logout
-from .models import Usuario, Producto, ObjetoCarrito, Carrito, Pedido, Pago, Mensaje, Notificacion
+from .models import Usuario, Producto, ObjetoCarrito, Carrito, Pedido, Pago, Mensaje, Notificacion, Direccion, DetallePedido
+from django.contrib import messages
 
-from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm
+
+from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm, PerfilForm
 
 # Create your views here.
  
@@ -81,14 +83,69 @@ def mi_cuenta(request):
     usuario = Usuario.objects.get(idUsuario=usuario_id)
     pedidos_recientes = Pedido.objects.filter(usuario=usuario).order_by("-fecha")[:5]
 
+    if request.method == "POST":
+        if "eliminar_foto" in request.POST:
+            if usuario.foto:
+                usuario.foto.delete(save=False)
+                usuario.foto = None
+                usuario.save()
+                messages.success(request, "Tu foto de perfil se eliminó correctamente.")
+            else:
+                messages.warning(request, "No tienes foto de perfil para eliminar.")
+            return redirect("mi_cuenta")
+
+        # Guardar cambios normales
+        form = PerfilForm(request.POST, request.FILES, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tu perfil se ha actualizado con éxito.")
+            return redirect("mi_cuenta")
+        else:
+            messages.error(request, "Hubo un error al actualizar tu perfil. Revisa los campos.")
+    else:
+        form = PerfilForm(instance=usuario)
+
     return render(
         request,
         "mi_cuenta.html",
         {
             "usuario": usuario,
             "pedidos_recientes": pedidos_recientes,
+            "form": form,
         },
     )
+
+def editar_perfil(request):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+    
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+
+    if request.method == "POST":
+        form = PerfilForm(request.POST, request.FILES, instance=usuario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tu perfil ha sido actualizado con éxito.")
+            return redirect("mi_cuenta")
+        else:
+            messages.error(request, "Hubo un error al actualizar tu perfil.")
+    else:
+        form = PerfilForm(instance=usuario)
+
+    return render(request, "editar_perfil.html", {
+        "form": form,
+        "usuario": usuario
+    })
+
+def vendedor_perfil(request, vendedor_id):
+    vendedor = Usuario.objects.get(idUsuario=vendedor_id)
+    productos = Producto.objects.filter(vendedor=vendedor).order_by('-idProducto')
+
+    return render(request, "vendedor_perfil.html", {
+        "vendedor": vendedor,
+        "productos": productos,
+    })
 
 
 #-----------PRODUCTOS----------------
@@ -224,6 +281,145 @@ def carrito_actualizar(request, objeto_id):
 
     return redirect("cart")
 
+
+def checkout(request):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    usuario = Usuario.objects.get(idUsuario=usuario_id)
+    carrito, _ = Carrito.objects.get_or_create(usuario=usuario)
+
+    # Carrito vacío → no se puede continuar
+    if carrito.total == 0 or carrito.objetos.count() == 0:
+        messages.error(request, "Tu carrito está vacío.")
+        return redirect("cart")
+
+    direcciones = Direccion.objects.filter(usuario=usuario)
+
+    if request.method == "POST":
+        direccion_id = request.POST.get("direccion_id", "").strip()
+        alias_nueva = request.POST.get("alias_nueva", "").strip()
+        direccion_nueva = request.POST.get("direccion_nueva", "").strip()
+
+        direccion_texto = None
+
+        # 1) Si eligió una dirección ya guardada (id numérica)
+        if direccion_id and direccion_id not in ("", "nueva"):
+            try:
+                dir_obj = Direccion.objects.get(
+                    idDireccion=direccion_id,
+                    usuario=usuario
+                )
+                direccion_texto = dir_obj.direccion
+            except Direccion.DoesNotExist:
+                direccion_texto = None
+
+        # 2) Si no hay direcciones o seleccionó explícitamente "nueva"
+        if direccion_id == "nueva" or (not direccion_texto and direcciones.count() == 0):
+            if not direccion_nueva.strip():
+                # Campo de dirección vacío → error y volvemos al template
+                messages.error(
+                    request,
+                    "Debes ingresar una nueva dirección para continuar."
+                )
+                shipping_cost = 2990 if carrito.total > 0 else 0
+                total_con_envio = carrito.total + shipping_cost
+                return render(
+                    request,
+                    "checkout.html",
+                    {
+                        "carrito": carrito,
+                        "objetos": carrito.objetos.select_related("producto"),
+                        "shipping_cost": shipping_cost,
+                        "total_con_envio": total_con_envio,
+                        "direcciones": direcciones,
+                    },
+                )
+
+            nueva_dir = Direccion.objects.create(
+                usuario=usuario,
+                alias=alias_nueva if alias_nueva else "",
+                direccion=direccion_nueva,
+            )
+            direccion_texto = nueva_dir.direccion
+
+        # 3) Si aún así no tenemos una dirección válida
+        if not direccion_texto:
+            messages.error(
+                request,
+                "Debes seleccionar una dirección guardada o agregar una nueva."
+            )
+            shipping_cost = 2990 if carrito.total > 0 else 0
+            total_con_envio = carrito.total + shipping_cost
+            return render(
+                request,
+                "checkout.html",
+                {
+                    "carrito": carrito,
+                    "objetos": carrito.objetos.select_related("producto"),
+                    "shipping_cost": shipping_cost,
+                    "total_con_envio": total_con_envio,
+                    "direcciones": direcciones,
+                },
+            )
+
+        # 4) Crear pedido, detalles e inmediato "pago"
+        shipping_cost = 2990 if carrito.total > 0 else 0
+
+        pedido = Pedido.objects.create(
+            usuario=usuario,
+            total=carrito.total + shipping_cost,
+            estado="pagado",  # o "pendiente" si luego quieres otro flujo
+            direccion=direccion_texto,
+            envio=shipping_cost,
+        )
+
+        # Detalles del pedido
+        for obj in carrito.objetos.select_related("producto"):
+            DetallePedido.objects.create(
+                pedido=pedido,
+                producto=obj.producto,
+                cantidad=obj.cantidad,
+                precio_unitario=obj.producto.precio,
+                subtotal=obj.subtotal,
+            )
+
+        # Pago asociado
+        Pago.objects.create(
+            pedido=pedido,
+            monto=pedido.total,
+            metodo="Pago en línea",
+            estado="pagado",
+        )
+
+        # Vaciar carrito
+        carrito.objetos.clear()
+        carrito.total = 0
+        carrito.save()
+
+        messages.success(
+            request,
+            f"Tu pedido #{pedido.idPedido} se creó y pagó correctamente."
+        )
+        return redirect("pedidos")
+
+    # GET → mostrar formulario de checkout
+    shipping_cost = 2990 if carrito.total > 0 else 0
+    total_con_envio = carrito.total + shipping_cost
+
+    return render(
+        request,
+        "checkout.html",
+        {
+            "carrito": carrito,
+            "objetos": carrito.objetos.select_related("producto"),
+            "shipping_cost": shipping_cost,
+            "total_con_envio": total_con_envio,
+            "direcciones": direcciones,
+        },
+    )
+
 #-----------PEDIDOS----------------
 
 def crear_pedido(request):
@@ -234,22 +430,41 @@ def crear_pedido(request):
     usuario = Usuario.objects.get(idUsuario=usuario_id)
     carrito = Carrito.objects.get(usuario=usuario)
 
-    if carrito.total == 0:
+    if carrito.total == 0 or carrito.objetos.count() == 0:
         return HttpResponse("Tu carrito está vacío")
-    
+
+    direccion = request.POST.get("direccion", "").strip()
+    envio = 2990 if carrito.total > 0 else 0
+
     pedido = Pedido.objects.create(
         usuario=usuario,
-        total=carrito.total,
-        estado = "pendiente"
+        total=carrito.total + envio,
+        estado="pagado",         # o "pendiente" según tu flujo
+        # direccion=direccion,
+        # envio=envio,
     )
 
-    #eliminar los productos del carrito
+    # Crear líneas de detalle a partir del carrito
+    for obj in carrito.objetos.select_related("producto"):
+        DetallePedido.objects.create(
+            pedido=pedido,
+            producto=obj.producto,
+            cantidad=obj.cantidad,
+            precio_unitario=obj.producto.precio,
+            subtotal=obj.subtotal,
+        )
 
+        # opcional: actualizar stock
+        # obj.producto.stock -= obj.cantidad
+        # obj.producto.save()
+
+    # Vaciar carrito
     carrito.objetos.clear()
     carrito.total = 0
     carrito.save()
 
-    return HttpResponse(f"Pedido creado con ID: {pedido.idPedido}")
+    messages.success(request, f"Tu pedido #{pedido.idPedido} se ha creado correctamente.")
+    return redirect("pedidos")
 
 def pedidos_ver(request):
     usuario_id = request.session.get("usuario_id")
@@ -258,6 +473,33 @@ def pedidos_ver(request):
     
     pedidos = Pedido.objects.filter(usuario_id=usuario_id)
     return render(request, "pedidos.html",{"pedidos": pedidos})
+
+def pedido_detalle(request, pedido_id):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    pedido = Pedido.objects.get(idPedido=pedido_id)
+
+    # seguridad: solo el dueño del pedido lo puede ver
+    if pedido.usuario.idUsuario != usuario_id:
+        return redirect("pedidos")
+
+    items = pedido.detalles.select_related("producto")
+    subtotal = sum(item.subtotal for item in items)
+    pago = Pago.objects.filter(pedido=pedido).first()
+
+    return render(
+        request,
+        "pedido_detalle.html",
+        {
+            "pedido": pedido,
+            "items": items,
+            "subtotal": subtotal,
+            "pago": pago,
+        },
+    )
+
 
 #-----------PAGOS----------------
 

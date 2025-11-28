@@ -22,24 +22,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pedido in pedidos %}
-                        <tr>
-                            <td>#{{ pedido.idPedido }}</td>
-                            <td>{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
-                            <td>{{ pedido.estado }}</td>
-                            <td>${{ pedido.total }}</td>
-                            <td>
-                                {% if pedido.estado != "pagado" %}
-                                    <a href="{% url 'pagar' pedido.idPedido %}" class="btn-secondary">
-                                        Pagar
-                                    </a>
-                                {% else %}
-                                    <span class="badge-success">Pagado</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
+                {% for pedido in pedidos %}
+                    <tr>
+                        <td>#{{ pedido.idPedido }}</td>
+                        <td>{{ pedido.fecha|date:"d/m/Y H:i" }}</td>
+
+                        <td>
+                            {% with pedido.estado|lower as estado %}
+                                <span class="badge-status
+                                    {% if estado == 'pagado' %} badge-success
+                                    {% elif estado == 'pendiente' %} badge-warning
+                                    {% elif estado == 'cancelado' %} badge-danger
+                                    {% else %} badge-neutral
+                                    {% endif %}
+                                ">
+                                    {{ pedido.estado|capfirst }}
+                                </span>
+                            {% endwith %}
+                        </td>
+
+                        <td>
+                            {% if pedido.direccion %}
+                                {{ pedido.direccion }}
+                            {% else %}
+                                <span class="orders-no-address">Sin dirección registrada</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="orders-col-total">
+                            ${{ pedido.total }}
+                        </td>
+
+                        <td class="orders-actions">
+                            <a href="{% url 'pedido_detalle' pedido.idPedido %}" class="btn-secondary btn-orders">
+                                Ver detalles
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
             </table>
         {% else %}
             <p>No tienes pedidos registrados.</p>

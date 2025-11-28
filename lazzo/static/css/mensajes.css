@@ -1,0 +1,58 @@
+/* ============================
+   Mensajes (Django messages)
+============================ */
+
+.messages-wrapper {
+    max-width: 1200px;
+    margin: 12px auto 0 auto;
+    padding: 0 16px;
+}
+
+.alert-message {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* cuando JS añade .show */
+.alert-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* al ocultar */
+.alert-message.hide {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+/* Colores según tipo de mensaje */
+.alert-message.success {
+    background: #e6f8e6;
+    border-left: 4px solid #28a745;
+    color: #146c2e;
+}
+
+.alert-message.error {
+    background: #fde8e8;
+    border-left: 4px solid #dc3545;
+    color: #a61d24;
+}
+
+.alert-message.warning {
+    background: #fff7e0;
+    border-left: 4px solid #ffb503;
+    color: #8a6d00;
+}
+
+.alert-message.info {
+    background: #e8f3ff;
+    border-left: 4px solid #0d6efd;
+    color: #084298;
+}
