@@ -86,7 +86,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- BOTONES (Cambiar / Eliminar) -->
+                        <!-- BOTONES (Cambiar / Eliminar imagen) -->
                         <div class="product-image-actions">
                             <!-- Botón que dispara el input file -->
                             <button type="button"
@@ -123,6 +123,25 @@
                 <a href="{% url 'mi_perfil' %}" class="btn-secondary" style="margin-left: 8px;">
                     Volver a mi perfil
                 </a>
+            </form>
+
+            <!-- BOTÓN ROJO: ELIMINAR PRODUCTO -->
+            <form method="post"
+                  action="{% url 'producto_eliminar' producto.idProducto %}"
+                  style="margin-top: 16px;"
+                  onsubmit="return confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.');">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn-secondary"
+                        style="
+                            background-color:#f44336;
+                            border-color:#e53935;
+                            color:#ffffff;
+                            width:100%;
+                            margin-top:4px;
+                        ">
+                    Eliminar producto
+                </button>
             </form>
 
         </div>
@@ -170,7 +189,7 @@
             if (!tipoSelect || !categoriaSelect) return;
 
             const tipo = tipoSelect.value;
-            const data = tipo === 'servicio' ? categorias_servicio : categorias_producto;
+            const data = (tipo === 'servicio') ? categorias_servicio : categorias_producto;
 
             categoriaSelect.innerHTML = '';
 
@@ -230,6 +249,7 @@
             });
         }
 
+        // Eliminar imagen (marca checkbox de limpiar)
         if (deleteBtn && clearCheckbox && img) {
             deleteBtn.addEventListener('click', function () {
                 const confirmDelete = confirm(
@@ -238,14 +258,14 @@
                 if (!confirmDelete) return;
 
                 clearCheckbox.checked = true;
-                fileInput.value = '';
+                if (fileInput) fileInput.value = '';
                 img.src = '';
                 img.style.display = 'none';
                 if (placeholder) placeholder.style.display = 'block';
             });
         }
 
-        // Ajustes visuales del widget oculto
+        // Ocultar el widget original (file + checkbox)
         const widgetWrapper = document.querySelector('.image-widget-wrapper');
         if (widgetWrapper) {
             widgetWrapper.style.display = 'none';

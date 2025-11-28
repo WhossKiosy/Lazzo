@@ -53,6 +53,7 @@ urlpatterns = [
     path("producto/nuevo/", views.producto_crear, name="producto_crear"),
     path("producto/<int:id>/", views.producto_detalle, name="producto_detalle"),
     path("producto/<int:producto_id>/editar/", views.producto_editar, name="producto_editar"),
+    path("producto/<int:producto_id>/eliminar/", views.producto_eliminar, name="producto_eliminar"),
 
     # Favoritos
     path("favoritos/", views.favoritos, name="favoritos"),

@@ -296,15 +296,38 @@ def categoria_listado(request, tipo, categoria_slug):
 
 
 def catalogo(request):
-    productos = Producto.objects.all()
-    productos_por_categoria = {}
-    for p in productos:
-        etiqueta = p.get_tipo_display() + " · " + p.categoria  # o como lo manejes
-        productos_por_categoria.setdefault(etiqueta, []).append(p)
+    productos = Producto.objects.all().order_by("-idProducto")
 
-    return render(request, 'catalogo.html', {
-        'productos_por_categoria': productos_por_categoria,
-    })
+    categorias_map = dict(CATEGORIAS_PRODUCTO + CATEGORIAS_SERVICIO)
+
+    productos_por_categoria = {}
+
+    for p in productos:
+        categoria_slug = p.categoria
+        tipo = getattr(p, "tipo", "producto")
+
+        # Nombre "bonito" de la categoría
+        nombre_categoria = categorias_map.get(
+            categoria_slug,
+            categoria_slug.replace("_", " ").title()
+        )
+
+        if categoria_slug not in productos_por_categoria:
+            productos_por_categoria[categoria_slug] = {
+                "nombre": nombre_categoria,
+                "tipo": tipo,
+                "productos": [],
+            }
+
+        productos_por_categoria[categoria_slug]["productos"].append(p)
+
+    return render(
+        request,
+        "catalogo.html",
+        {
+            "productos_por_categoria": productos_por_categoria,
+        },
+    )
 
 
 #-----------SERVICIOS----------------
@@ -451,6 +474,22 @@ def producto_editar(request, producto_id):
         },
     )
 
+def producto_eliminar(request, producto_id):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    producto = get_object_or_404(Producto, idProducto=producto_id)
+
+    if producto.vendedor_id != usuario_id:
+        return HttpResponse("No tienes permiso para eliminar este producto.", status=403)
+
+    if request.method == "POST":
+        producto.delete()
+        messages.success(request, "Producto eliminado correctamente.")
+        return redirect("mi_perfil")
+    
+    return redirect("producto_editar", producto_id=producto.idProducto)
 
 #-----------CARRITO---------------- 
 

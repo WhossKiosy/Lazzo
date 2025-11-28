@@ -8,16 +8,32 @@
     <div class="container">
         <div class="section-header">
             <h2>Catálogo completo</h2>
+            <span class="see-all">Todos los productos por categoría</span>
         </div>
 
         {% if productos_por_categoria %}
-            {% for categoria, lista in productos_por_categoria.items %}
-                <div class="section-header" style="margin-top: 10px;">
-                    <h3>{{ categoria }}</h3>
+            {% for categoria_slug, categoria_data in productos_por_categoria.items %}
+                
+                <div class="section-header" style="margin-top: 25px; display:flex; justify-content:space-between; align-items:center;">
+                    <h3>{{ categoria_data.nombre }}</h3>
+
+                    <!-- BOTÓN VER MÁS -->
+                    <a 
+                        href="{% url 'categoria_list' categoria_data.tipo categoria_slug %}"
+                        class="btn-secondary"
+                        style="
+                            padding:6px 12px;
+                            font-size:0.9rem;
+                            border-radius:8px;
+                            text-decoration:none;
+                        "
+                    >
+                        Ver más
+                    </a>
                 </div>
 
                 <div class="products-grid">
-                    {% for producto in lista %}
+                    {% for producto in categoria_data.productos %}
                         <article class="product-card">
                             <div class="product-image">
                                 {% if producto.imagen %}
