@@ -21,6 +21,12 @@ class ProductoForm(forms.ModelForm):
         fields = ["nombre", "descripcion", "precio", "stock", "imagen", "categoria"]
 
 
+class ServicioForm(forms.ModelForm):
+    class Meta:
+        model = Servicio
+        fields = ["nombre", "descripcion", "precio", "imagen", "categoria"]
+
+
 class MensajeForm(forms.ModelForm):
     class Meta:
         model = Mensaje
