@@ -1,70 +1,143 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Catálogo completo - Lazzo{% endblock %}
+{% block title %}Catálogo - Lazzo{% endblock %}
 
 {% block content %}
 <section class="products-section">
     <div class="container">
         <div class="section-header">
             <h2>Catálogo completo</h2>
-            <span class="see-all">Todos los productos por categoría</span>
         </div>
 
-        {% if productos_por_categoria %}
-            {% for categoria_slug, categoria_data in productos_por_categoria.items %}
-                
-                <div class="section-header" style="margin-top: 25px; display:flex; justify-content:space-between; align-items:center;">
-                    <h3>{{ categoria_data.nombre }}</h3>
+        <!-- ====== BARRA DE FILTROS / ORDEN ====== -->
+        <form method="get" class="catalog-filters">
+            <div class="catalog-filters-row">
+                <div class="filter-group">
+                    <label for="id_min_precio">Precio mínimo</label>
+                    <input
+                        type="number"
+                        name="min_precio"
+                        id="id_min_precio"
+                        min="0"
+                        value="{{ min_precio|default:'' }}"
+                        placeholder="Desde">
+                </div>
 
-                    <!-- BOTÓN VER MÁS -->
-                    <a 
-                        href="{% url 'categoria_list' categoria_data.tipo categoria_slug %}"
-                        class="btn-secondary"
-                        style="
-                            padding:6px 12px;
-                            font-size:0.9rem;
-                            border-radius:8px;
-                            text-decoration:none;
-                        "
-                    >
-                        Ver más
+                <div class="filter-group">
+                    <label for="id_max_precio">Precio máximo</label>
+                    <input
+                        type="number"
+                        name="max_precio"
+                        id="id_max_precio"
+                        min="0"
+                        value="{{ max_precio|default:'' }}"
+                        placeholder="Hasta">
+                </div>
+
+                <div class="filter-group">
+                    <label for="id_orden">Ordenar por</label>
+                    <select name="orden" id="id_orden">
+                        <option value="relevancia" {% if orden == "relevancia" %}selected{% endif %}>
+                            Relevancia (por defecto)
+                        </option>
+                        <option value="precio_asc" {% if orden == "precio_asc" %}selected{% endif %}>
+                            Precio: más bajo primero
+                        </option>
+                        <option value="precio_desc" {% if orden == "precio_desc" %}selected{% endif %}>
+                            Precio: más alto primero
+                        </option>
+                        <option value="recientes" {% if orden == "recientes" %}selected{% endif %}>
+                            Más recientes
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn-primary">
+                        Aplicar filtros
+                    </button>
+                    <a href="{% url 'catalogo' %}" class="btn-secondary">
+                        Limpiar
                     </a>
                 </div>
+            </div>
+        </form>
 
-                <div class="products-grid">
-                    {% for producto in categoria_data.productos %}
-                        <article class="product-card">
-                            <div class="product-image">
-                                {% if producto.imagen %}
-                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                                {% else %}
-                                    <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
-                                {% endif %}
-                            </div>
+        <br>
 
-                            <h3 class="product-title">{{ producto.nombre }}</h3>
-                            <p class="product-brand">{{ producto.categoria }}</p>
+        <!-- ====== LISTADO AGRUPADO POR CATEGORÍA (solo página actual) ====== -->
+        {% if productos_por_categoria %}
+            {% for categoria_slug, data in productos_por_categoria.items %}
+                <section class="catalog-category-block">
+                    <div class="section-header" style="margin-top: 24px;">
+                        <h3>{{ data.nombre }}</h3>
+                        <a href="{% url 'categoria_list' data.tipo categoria_slug %}" class="see-all">
+                            Ver solo esta categoría
+                        </a>
+                    </div>
 
-                            <div class="product-prices">
-                                <span class="current-price">${{ producto.precio }}</span>
-                            </div>
+                    <div class="products-grid">
+                        {% for producto in data.productos %}
+                            <article class="product-card">
+                                <div class="product-image">
+                                    {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                    {% else %}
+                                        <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                                    {% endif %}
+                                </div>
 
-                            <div class="product-actions">
-                                <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
-                                    Ver detalles
-                                </a>
-                                <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
-                                    Agregar al carro
-                                </a>
-                            </div>
-                        </article>
-                    {% endfor %}
-                </div>
+                                <h3 class="product-title">{{ producto.nombre }}</h3>
+
+                                <p class="product-brand">
+                                    {{ data.nombre }}
+                                </p>
+
+                                <div class="product-prices">
+                                    <span class="current-price">${{ producto.precio }}</span>
+                                </div>
+
+                                <div class="product-actions">
+                                    <a href="{% url 'producto_detalle' producto.idProducto %}" class="btn-secondary">
+                                        Ver detalles
+                                    </a>
+                                    <a href="{% url 'cart_add' producto.idProducto %}" class="btn-primary">
+                                        Agregar al carro
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
             {% endfor %}
         {% else %}
-            <p>No hay productos disponibles en el catálogo.</p>
+            <p>No se encontraron productos con los filtros seleccionados.</p>
         {% endif %}
+
+        <!-- ====== PAGINACIÓN ====== -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="pagination">
+                {% if page_obj.has_previous %}
+                    <a class="page-link"
+                       href="?page={{ page_obj.previous_page_number }}&min_precio={{ min_precio }}&max_precio={{ max_precio }}&orden={{ orden }}">
+                        « Anterior
+                    </a>
+                {% endif %}
+
+                <span class="page-info">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a class="page-link"
+                       href="?page={{ page_obj.next_page_number }}&min_precio={{ min_precio }}&max_precio={{ max_precio }}&orden={{ orden }}">
+                        Siguiente »
+                    </a>
+                {% endif %}
+            </nav>
+        {% endif %}
+
     </div>
 </section>
 {% endblock %}

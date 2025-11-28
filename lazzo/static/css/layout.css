@@ -425,3 +425,65 @@
         right: auto;
     }
 }
+
+.catalog-filters {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-bottom: 8px;
+}
+
+.catalog-filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 150px;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.pagination {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.page-link {
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.page-link:hover {
+    background-color: #f5f5f5;
+}
+
+.page-info {
+    font-size: 0.9rem;
+    color: #555;
+}

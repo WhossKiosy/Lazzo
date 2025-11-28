@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 from django.contrib.auth import logout as django_logout
 from .models import (
     Usuario, Producto, ObjetoCarrito, Carrito, Pedido, 
@@ -8,7 +9,6 @@ from .models import (
 from django.contrib import messages
 from django.db.models import Q
 import random
-
 from .forms import RegistroForm, LoginForm, ProductoForm, MensajeForm, PerfilForm, ServicioForm
 
 # Create your views here.
@@ -296,38 +296,61 @@ def categoria_listado(request, tipo, categoria_slug):
 
 
 def catalogo(request):
-    productos = Producto.objects.all().order_by("-idProducto")
+    # --- Filtros desde la URL (GET) ---
+    min_precio = request.GET.get("min_precio", "").strip()
+    max_precio = request.GET.get("max_precio", "").strip()
+    orden = request.GET.get("orden", "relevancia")  # relevancia / precio_asc / precio_desc / recientes
 
-    categorias_map = dict(CATEGORIAS_PRODUCTO + CATEGORIAS_SERVICIO)
+    # Base: todos los productos
+    productos = Producto.objects.all()
+
+    # Filtro por rango de precios
+    if min_precio.isdigit():
+        productos = productos.filter(precio__gte=int(min_precio))
+    if max_precio.isdigit():
+        productos = productos.filter(precio__lte=int(max_precio))
+
+    # Ordenamiento
+    if orden == "precio_asc":
+        productos = productos.order_by("precio")
+    elif orden == "precio_desc":
+        productos = productos.order_by("-precio")
+    elif orden == "recientes":
+        productos = productos.order_by("-idProducto")
+    else:
+        # "relevancia": por ahora usamos también más recientes
+        productos = productos.order_by("-idProducto")
+
+    # ---------- PAGINACIÓN ----------
+    paginator = Paginator(productos, 12)  # 12 productos por página
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    # ---------- AGRUPAR POR CATEGORÍA (solo los de la página actual) ----------
+    mapa_categorias = dict(CATEGORIAS_PRODUCTO + CATEGORIAS_SERVICIO)
 
     productos_por_categoria = {}
-
-    for p in productos:
+    for p in page_obj.object_list:
         categoria_slug = p.categoria
-        tipo = getattr(p, "tipo", "producto")
-
-        # Nombre "bonito" de la categoría
-        nombre_categoria = categorias_map.get(
-            categoria_slug,
-            categoria_slug.replace("_", " ").title()
-        )
+        tipo = p.tipo  # "producto" o "servicio"
 
         if categoria_slug not in productos_por_categoria:
             productos_por_categoria[categoria_slug] = {
-                "nombre": nombre_categoria,
+                "nombre": mapa_categorias.get(categoria_slug, categoria_slug),
                 "tipo": tipo,
-                "productos": [],
+                "productos": []
             }
 
         productos_por_categoria[categoria_slug]["productos"].append(p)
 
-    return render(
-        request,
-        "catalogo.html",
-        {
-            "productos_por_categoria": productos_por_categoria,
-        },
-    )
+    context = {
+        "page_obj": page_obj,
+        "productos_por_categoria": productos_por_categoria,
+        "min_precio": min_precio,
+        "max_precio": max_precio,
+        "orden": orden,
+    }
+    return render(request, "catalogo.html", context)
 
 
 #-----------SERVICIOS----------------
