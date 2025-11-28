@@ -44,6 +44,10 @@ def home(request):
     )
 
 
+def acerca(request):
+    return render(request, 'acerca.html')
+
+
 def registro(request):
     error_message = None
 
@@ -289,6 +293,18 @@ def categoria_listado(request, tipo, categoria_slug):
         "categoria_nombre": categoria_nombre,
     }
     return render(request, "categoria_listado.html", context)
+
+
+def catalogo(request):
+    productos = Producto.objects.all()
+    productos_por_categoria = {}
+    for p in productos:
+        etiqueta = p.get_tipo_display() + " · " + p.categoria  # o como lo manejes
+        productos_por_categoria.setdefault(etiqueta, []).append(p)
+
+    return render(request, 'catalogo.html', {
+        'productos_por_categoria': productos_por_categoria,
+    })
 
 
 #-----------SERVICIOS----------------

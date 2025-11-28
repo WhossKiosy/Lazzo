@@ -13,65 +13,64 @@
 
     <!-- Top bar -->
     <div class="top-bar">
-    <div class="container top-bar-content">
-        <div>
-            <a href="#">Ayuda</a>
-            <a href="#">Seguimiento de compra</a>
-            <a href="#">Sucursales</a>
-        </div>
+        <div class="container top-bar-content">
+            <div>
+                <a href="{% url 'acerca' %}#ayuda">Ayuda</a>
+                <a href="{% url 'acerca' %}#seguimiento-compra">Seguimiento de compra</a>
+                <a href="{% url 'acerca' %}#sucursales">Sucursales</a>
+            </div>
 
-        <div>
-            {% if request.session.usuario_id %}
-                <div class="user-menu">
-                    <button type="button" class="user-menu-toggle">
-                        <img src="{% static 'img/user.png' %}" alt="user" width="20">
-                        <span class="header-user">
-                            Hola, {{ request.session.usuario_nombre }}
-                        </span>
-                        <span class="user-menu-caret">▾</span>
-                    </button>
-
-                    <div class="user-menu-dropdown">
-                        <div class="user-menu-header">
-                            <strong>{{ request.session.usuario_nombre }}</strong>
-                            <span class="user-menu-role">
-                                {{ request.session.usuario_rol|title }}
+            <div>
+                {% if request.session.usuario_id %}
+                    <div class="user-menu">
+                        <button type="button" class="user-menu-toggle">
+                            <img src="{% static 'img/user.png' %}" alt="user" width="20">
+                            <span class="header-user">
+                                Hola, {{ request.session.usuario_nombre }}
                             </span>
+                            <span class="user-menu-caret">▾</span>
+                        </button>
+
+                        <div class="user-menu-dropdown">
+                            <div class="user-menu-header">
+                                <strong>{{ request.session.usuario_nombre }}</strong>
+                                <span class="user-menu-role">
+                                    {{ request.session.usuario_rol|title }}
+                                </span>
+                            </div>
+
+                            {# Perfil público (cliente o vendedor) #}
+                            <a href="{% url 'mi_perfil' %}" class="user-menu-link">Mi perfil</a>
+
+                            {# Configuración / edición de datos de cuenta #}
+                            <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Editar cuenta</a>
+
+                            <a href="{% url 'pedidos' %}" class="user-menu-link">Mis compras</a>
+                            <a href="{% url 'favoritos' %}" class="user-menu-link">Favoritos</a>
+                            <a href="{% url 'mensajes' %}" class="user-menu-link">Mensajes</a>
+                            <a href="{% url 'notificaciones' %}" class="user-menu-link">Notificaciones</a>
+
+                            {% if request.session.usuario_rol == 'vendedor' %}
+                                <a href="{% url 'producto_crear' %}" class="user-menu-link">
+                                    Añadir producto
+                                </a>
+                            {% endif %}
+
+                            <form method="post" action="{% url 'logout' %}" class="user-menu-logout">
+                                {% csrf_token %}
+                                <button type="submit" class="user-menu-logout-btn">
+                                    Cerrar sesión
+                                </button>
+                            </form>
                         </div>
-
-                        {# Perfil público (cliente o vendedor) #}
-                        <a href="{% url 'mi_perfil' %}" class="user-menu-link">Mi perfil</a>
-
-                        {# Configuración / edición de datos de cuenta #}
-                        <a href="{% url 'mi_cuenta' %}" class="user-menu-link">Editar cuenta</a>
-
-                        <a href="{% url 'pedidos' %}" class="user-menu-link">Mis compras</a>
-                        <a href="{% url 'favoritos' %}" class="user-menu-link">Favoritos</a>
-                        <a href="{% url 'mensajes' %}" class="user-menu-link">Mensajes</a>
-                        <a href="{% url 'notificaciones' %}" class="user-menu-link">Notificaciones</a>
-
-                        {% if request.session.usuario_rol == 'vendedor' %}
-                            <a href="{% url 'producto_crear' %}" class="user-menu-link">
-                                Añadir producto
-                            </a>
-                        {% endif %}
-
-                        <form method="post" action="{% url 'logout' %}" class="user-menu-logout">
-                            {% csrf_token %}
-                            <button type="submit" class="user-menu-logout-btn">
-                                Cerrar sesión
-                            </button>
-                        </form>
                     </div>
-                </div>
-            {% else %}
-                <a href="{% url 'login' %}">Iniciar sesión</a>
-                <a href="{% url 'registro' %}">Crear cuenta</a>
-            {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}">Iniciar sesión</a>
+                    <a href="{% url 'registro' %}">Crear cuenta</a>
+                {% endif %}
             </div>
         </div>
     </div>
-
 
     <!-- Header principal -->
     <header class="main-header">
@@ -92,7 +91,6 @@
 
                 <form id="searchForm" method="GET" action="{% url 'buscar' %}"></form>
             </div>
-
 
             <div class="header-icons">
                 <a href="{% url 'pedidos' %}" class="header-icon">Mis compras</a>
@@ -167,15 +165,15 @@
         <div class="container footer-content">
             <div class="footer-column">
                 <h4>Atención al cliente</h4>
-                <a href="#">Preguntas frecuentes</a>
-                <a href="#">Términos y condiciones</a>
-                <a href="#">Política de privacidad</a>
+                <a href="{% url 'acerca' %}#faq">Preguntas frecuentes</a>
+                <a href="{% url 'acerca' %}#terminos">Términos y condiciones</a>
+                <a href="{% url 'acerca' %}#privacidad">Política de privacidad</a>
             </div>
             <div class="footer-column">
                 <h4>Sobre nosotros</h4>
-                <a href="#">Quiénes somos</a>
-                <a href="#">Trabaja con nosotros</a>
-                <a href="#">Sostenibilidad</a>
+                <a href="{% url 'acerca' %}#quienes-somos">Quiénes somos</a>
+                <a href="{% url 'acerca' %}#trabaja-con-nosotros">Trabaja con nosotros</a>
+                <a href="{% url 'acerca' %}#sostenibilidad">Sostenibilidad</a>
             </div>
             <div class="footer-column">
                 <h4>Medios de pago</h4>
@@ -219,17 +217,14 @@
         const alerts = document.querySelectorAll('.alert-message');
 
         alerts.forEach(function (alert, index) {
-            // Pequeño delay para el efecto "slide in"
             setTimeout(function () {
                 alert.classList.add('show');
             }, 40 + index * 80);
 
-            // Autodesaparecer después de 4 segundos
             setTimeout(function () {
                 alert.classList.add('hide');
             }, 4000 + index * 200);
 
-            // Eliminar del DOM después de la transición
             setTimeout(function () {
                 if (alert && alert.parentNode) {
                     alert.parentNode.removeChild(alert);
@@ -246,11 +241,9 @@
 
             if (!toggle || !menu) return;
 
-            // Abrir/cerrar al hacer click
             toggle.addEventListener('click', function (e) {
                 e.stopPropagation();
 
-                // Cerrar otros menús
                 navDropdowns.forEach(function (d) {
                     if (d !== dropdown) d.classList.remove('open');
                 });
@@ -259,7 +252,6 @@
             });
         });
 
-        // Cerrar todos al hacer click fuera
         document.addEventListener('click', function () {
             navDropdowns.forEach(function (d) {
                 d.classList.remove('open');

@@ -17,6 +17,8 @@ urlpatterns = [
             views.categoria_listado,
             name="categoria_listado",
         ),
+    path('acerca/', views.acerca, name='acerca'),
+    path('catalogo/', views.catalogo, name='catalogo'),
 
     # Autenticación
     path('login/', views.login, name="login"),
