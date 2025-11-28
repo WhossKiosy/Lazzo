@@ -72,6 +72,7 @@
         </div>
     </div>
 
+
     <!-- Header principal -->
     <header class="main-header">
         <div class="container header-content">
@@ -95,7 +96,50 @@
             <div class="header-icons">
                 <a href="{% url 'pedidos' %}" class="header-icon">Mis compras</a>
                 <a href="{% url 'favoritos' %}" class="header-icon">Favoritos</a>
-                <a href="{% url 'cart' %}" class="header-icon cart-icon">Carro (0)</a>
+
+                <!-- WRAPPER DEL CARRO CON MINI-CARRITO -->
+                <div class="cart-icon-wrapper">
+                    <a href="{% url 'cart' %}" class="header-icon cart-icon">
+                        Carro ({{ carrito_cantidad|default:"0" }})
+                    </a>
+
+                    <div class="mini-cart-dropdown">
+                        {% if carrito_cantidad %}
+                            <ul class="mini-cart-items">
+                                {% for item in carrito_items_preview %}
+                                    <li class="mini-cart-item">
+                                        {% if item.imagen %}
+                                            <img src="{{ item.imagen }}" alt="{{ item.nombre }}" class="mini-cart-thumb">
+                                        {% else %}
+                                            <div class="mini-cart-thumb mini-cart-thumb-placeholder"></div>
+                                        {% endif %}
+
+                                        <div class="mini-cart-item-info">
+                                            <span class="mini-cart-item-name">{{ item.nombre }}</span>
+                                            <span class="mini-cart-item-qty">x{{ item.cantidad }}</span>
+                                            <span class="mini-cart-item-subtotal">${{ item.subtotal }}</span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="mini-cart-footer">
+                                <div class="mini-cart-total">
+                                    <span>Total estimado</span>
+                                    <span>${{ carrito_total_preview }}</span>
+                                </div>
+                                <div class="mini-cart-actions">
+                                    <a href="{% url 'cart' %}" class="btn-secondary btn-small">Ver carrito</a>
+                                    <a href="{% url 'checkout' %}" class="btn-primary btn-small">Ir a pagar</a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="mini-cart-empty">
+                                Tu carrito está vacío.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </header>
