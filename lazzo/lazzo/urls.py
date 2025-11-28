@@ -14,6 +14,8 @@ urlpatterns = [
     # Autenticación
     path('login/', views.login, name="login"),
     path('signup/', views.registro, name="registro"),
+    path('registro/', views.registro, name="signup"),
+
     path('logout/', views.logout, name="logout"),
 
     # Carrito
