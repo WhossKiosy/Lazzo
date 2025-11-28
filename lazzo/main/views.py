@@ -151,8 +151,15 @@ def vendedor_perfil(request, vendedor_id):
 #-----------PRODUCTOS----------------
 
 def home(request):
-    productos = Producto.objects.all().order_by('-idProducto')
-    return render(request, "home.html", {"productos": productos})
+    query = request.GET.get("q", "").strip()  # texto buscado
+    if query:
+        productos = Producto.objects.filter(nombre__icontains=query).order_by("-idProducto")
+    else:
+        productos = Producto.objects.all().order_by("-idProducto")
+    return render(request, "home.html", {
+        "productos": productos,
+        "query": query,
+    })
 
 def producto_detalle(request, id):
     producto = Producto.objects.get(idProducto=id)
