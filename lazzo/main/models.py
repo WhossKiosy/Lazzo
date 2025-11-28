@@ -28,7 +28,7 @@ class Usuario(models.Model):
     ]
     idUsuario = models.AutoField(primary_key=True)
     nombre_completo = models.CharField(max_length=100)
-    correo = models.EmailField(unique=True)
+    correo = models.EmailField(max_length=100, unique=True)
     contrasena = models.CharField(max_length=50)
     rol = models.CharField(max_length=20, choices=roles)
     fecha_registro = models.DateTimeField(default=timezone.now)
@@ -90,7 +90,7 @@ class Direccion(models.Model):
     idDireccion = models.AutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name="direcciones")
     alias = models.CharField(max_length=100, blank=True)  # Ej: "Casa", "Trabajo"
-    direccion = models.CharField(max_length=255)          # Texto completo
+    direccion = models.CharField(max_length=100)          # Texto completo
 
     def __str__(self):
         # Lo que se mostrará en el admin / templates
@@ -105,7 +105,7 @@ class Pedido(models.Model):
     fecha = models.DateTimeField(default=timezone.now)
     estado = models.CharField(max_length=20)
     total = models.IntegerField()
-    direccion = models.CharField(max_length=255, blank=True, null=True)
+    direccion = models.CharField(max_length=100, blank=True, null=True)
     envio = models.IntegerField(default=0)
 
     def __str__(self):
