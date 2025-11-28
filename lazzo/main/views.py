@@ -556,19 +556,32 @@ def carrito_agregar(request, producto_id):
 
     producto = Producto.objects.get(idProducto=producto_id)
 
+    # Si no hay stock, no dejamos agregar
+    if producto.stock <= 0:
+        messages.error(request, "Este producto no tiene stock disponible.")
+        return redirect("producto_detalle", id=producto_id)
+
     objeto = carrito.objetos.filter(producto=producto).first()
 
     if objeto:
-        objeto.cantidad += 1
-        objeto.calcular_subtotal()
+        # No dejar que la cantidad supere el stock
+        if objeto.cantidad >= producto.stock:
+            messages.warning(request, "Has alcanzado el máximo disponible de este producto.")
+        else:
+            objeto.cantidad += 1
+            objeto.calcular_subtotal()
     else:
-        nuevo = ObjetoCarrito.objects.create(producto=producto, cantidad=1)
+        nuevo = ObjetoCarrito.objects.create(
+            producto=producto,
+            cantidad=1
+        )
         nuevo.calcular_subtotal()
         carrito.objetos.add(nuevo)
     
     carrito.calcular_total()
 
     return redirect("cart")
+
 
 def carrito_eliminar(request, objeto_id):
     usuario_id = request.session.get("usuario_id")
@@ -597,7 +610,11 @@ def carrito_actualizar(request, objeto_id):
         return redirect("login")
 
     if request.method == "POST":
-        cantidad = int(request.POST.get("cantidad", 1))
+        try:
+            cantidad = int(request.POST.get("cantidad", 1))
+        except ValueError:
+            cantidad = 1
+
         if cantidad < 1:
             cantidad = 1
 
@@ -605,12 +622,31 @@ def carrito_actualizar(request, objeto_id):
         carrito = Carrito.objects.get(usuario=usuario)
 
         objeto = carrito.objetos.get(idObjeto=objeto_id)
+        producto = objeto.producto
+
+        # Límite superior = stock disponible
+        if producto.stock <= 0:
+            # si ya no hay stock, eliminamos el ítem del carrito
+            carrito.objetos.remove(objeto)
+            objeto.delete()
+            carrito.calcular_total()
+            messages.error(request, f"El producto '{producto.nombre}' ya no tiene stock disponible.")
+            return redirect("cart")
+
+        if cantidad > producto.stock:
+            cantidad = producto.stock
+            messages.warning(
+                request,
+                f"La cantidad se ajustó al stock disponible ({producto.stock}) para '{producto.nombre}'."
+            )
+
         objeto.cantidad = cantidad
         objeto.calcular_subtotal()
 
         carrito.calcular_total()
 
     return redirect("cart")
+
 
 
 def checkout(request):
@@ -621,7 +657,7 @@ def checkout(request):
     usuario = Usuario.objects.get(idUsuario=usuario_id)
     carrito, _ = Carrito.objects.get_or_create(usuario=usuario)
 
-    # Carrito vacío → no se puede continuar
+    # Carrito vacío no se puede continuar
     if carrito.total == 0 or carrito.objetos.count() == 0:
         messages.error(request, "Tu carrito está vacío.")
         return redirect("cart")
@@ -706,15 +742,36 @@ def checkout(request):
             envio=shipping_cost,
         )
 
-        # Detalles del pedido
+        # Detalles del pedido + DESCUENTO DE STOCK
         for obj in carrito.objetos.select_related("producto"):
+            producto = obj.producto
+
+            # Seguridad extra: si por alguna razón la cantidad supera stock aquí,
+            # cortamos el flujo y avisamos.
+            if obj.cantidad > producto.stock:
+                messages.error(
+                    request,
+                    f"No hay stock suficiente para '{producto.nombre}'. "
+                    f"Stock actual: {producto.stock}, en carrito: {obj.cantidad}."
+                )
+                # revertir pedido recién creado
+                pedido.delete()
+                return redirect("cart")
+
+            # Crear detalle
             DetallePedido.objects.create(
                 pedido=pedido,
-                producto=obj.producto,
+                producto=producto,
                 cantidad=obj.cantidad,
-                precio_unitario=obj.producto.precio,
+                precio_unitario=producto.precio,
                 subtotal=obj.subtotal,
             )
+
+            # Descontar stock
+            producto.stock -= obj.cantidad
+            if producto.stock < 0:
+                producto.stock = 0
+            producto.save()
 
         # Pago asociado
         Pago.objects.create(
@@ -735,7 +792,7 @@ def checkout(request):
         )
         return redirect("pedidos")
 
-    # GET → mostrar formulario de checkout
+    # GET mostrar formulario de checkout
     shipping_cost = 2990 if carrito.total > 0 else 0
     total_con_envio = carrito.total + shipping_cost
 
@@ -767,27 +824,46 @@ def crear_pedido(request):
     direccion = request.POST.get("direccion", "").strip()
     envio = 2990 if carrito.total > 0 else 0
 
+    # Crear pedido preliminar
     pedido = Pedido.objects.create(
         usuario=usuario,
         total=carrito.total + envio,
-        estado="pagado",         # o "pendiente" según tu flujo
+        estado="pagado",      # puedes cambiarlo a "pendiente"
         # direccion=direccion,
         # envio=envio,
     )
 
-    # Crear líneas de detalle a partir del carrito
+    # Validar stock antes de finalizar pedido
     for obj in carrito.objetos.select_related("producto"):
+        producto = obj.producto
+
+        if obj.cantidad > producto.stock:
+            # Revertir pedido porque no hay stock suficiente
+            pedido.delete()
+            messages.error(
+                request,
+                f"No hay stock suficiente para '{producto.nombre}'. "
+                f"Disponible: {producto.stock}, solicitado: {obj.cantidad}."
+            )
+            return redirect("cart")
+
+    # Crear detalles y descontar stock
+    for obj in carrito.objetos.select_related("producto"):
+        producto = obj.producto
+
         DetallePedido.objects.create(
             pedido=pedido,
-            producto=obj.producto,
+            producto=producto,
             cantidad=obj.cantidad,
-            precio_unitario=obj.producto.precio,
+            precio_unitario=producto.precio,
             subtotal=obj.subtotal,
         )
 
-        # opcional: actualizar stock
-        # obj.producto.stock -= obj.cantidad
-        # obj.producto.save()
+        # Descontar stock de forma segura
+        producto.stock -= obj.cantidad
+        if producto.stock < 0:
+            producto.stock = 0
+        producto.save()
 
     # Vaciar carrito
     carrito.objetos.clear()
